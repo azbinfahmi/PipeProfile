@@ -1,0 +1,79 @@
+html
+{
+    background-color: powderblue;
+}
+
+.mini
+{
+    background-color: aliceblue;
+    display: block;
+    margin-left: auto;   
+    margin-right: auto;
+    max-width: max-content; 
+    max-height: max-content;
+}
+h1
+{
+    text-align: center;
+    font-family:'Courier New', Courier, monospace;
+}
+.canvas_1
+{
+    display: flex;
+}
+.main
+{
+    background-color: rgb(201, 194, 194);
+    border: 3px solid rgb(0, 0, 0);
+    display: block;
+    margin-left: auto;   
+    margin-right: auto; 
+    margin-top: auto;
+    
+}
+
+ul
+{
+    background-color: rgb(53, 185, 202);
+    max-width: fit-content;
+    max-height: 500px;
+    padding: 0%;
+    margin: 0%;
+    border: 2px solid black;
+}
+
+
+li
+{
+    list-style: none;
+    padding: 10px;
+    
+}
+
+table
+{
+    border: 2px solid black;
+    margin: auto;
+    height: 200px;
+    background-color: rgba(178, 225, 235, 0.76);
+    
+}
+
+th
+{
+    
+    padding: 10px;
+    border: 1px solid black;
+
+}
+tr
+{
+    border: 1px solid black;
+}
+
+td
+{
+    padding: 10px;
+    text-align: center;
+    border: 2px solid black;
+}
