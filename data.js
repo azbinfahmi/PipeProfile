@@ -123,7 +123,7 @@ canvasElem.addEventListener("mousedown", function(e)
           total_depth = maxdepth2[0][0] - maxdepth2[1][0]
           total_pixel = maxdepth2[1][2] - maxdepth2[0][2]
           calc = total_pixel / total_depth
-//           console.log(maxdepth2)
+          console.log(maxdepth2)
           for (var i= 1; i < total_depth ; i++ )
           {
             drawcircle("black", maxdepth2[0][1], maxdepth2[0][2] + (calc * i))
@@ -153,14 +153,14 @@ canvasElem.addEventListener("mousedown", function(e)
         pipe_check.push([coordX[lastx], coordY[lasty]])
         drawcircle("yellow", coordX[lastx], coordY[lasty])
         pipelevel.push(level(coordY[lasty]))
-//         console.log('pipelevel',pipelevel)
+        console.log('pipelevel',pipelevel)
         if(pipecoord.length > 1)
         {
           drawline(pipecoord[mark1-2][0], pipecoord[mark1-2][1], pipecoord[mark1-1][0], pipecoord[mark1-1][1])
         }
 
         //draw horizontal line
-        drawline(pipecoord[mark1-1][0], 0, pipecoord[mark1-1][0], 2000 )
+        drawline(pipecoord[mark1-1][0], 0, pipecoord[mark1-1][0], 20000 )
       }
     }
 
@@ -183,12 +183,12 @@ canvasElem.addEventListener("mousedown", function(e)
           groundcoord.push([coordX[lastx], coordY[lasty]])
           drawcircle("blue", coordX[lastx], coordY[lasty])
           groundlevel.push(level(coordY[lasty]))
-//           console.log('groundlevel :',groundlevel)
+          console.log('groundlevel :',groundlevel)
           
           pipelength = prompt("Insert pipe length value")
           var combine =pipelevel.concat(groundlevel)
           data.push([combine[0],combine[1], Number(pipelength)])
-//           console.log('data:',data)
+          console.log('data:',data)
 
           //draw line for each point
           if(groundcoord.length > 1)
@@ -256,10 +256,10 @@ let saveFile = () =>
   }
 
 
-//   console.log('newArr',newArr)
+  console.log('newArr',newArr)
   var savedata1 = newArr.toString().replaceAll(",", "\t")
   var savedata1 = savedata1.toString().replaceAll(":\t", "")
-//   console.log('savedata1:\n',savedata1)
+  console.log('savedata1:\n',savedata1)
   let savedata2 ='p_level\t' + 'g_level\t' + 'length';
   const textToBLOB = new Blob([savedata2,savedata1], {type: 'text/plain'});
   const sFileName = prompt("Insert file name?")
