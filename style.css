@@ -102,3 +102,15 @@ td
     border: 2px solid black;
     
 }
+
+footer 
+{
+    padding: 10px;
+    text-align: center;
+}
+  
+footer p 
+{
+    font-size: 14px;
+    color: #666;
+}
