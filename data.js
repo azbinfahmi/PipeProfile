@@ -1,9 +1,9 @@
 
 
 var coordX = [], coordY= [], Xaxis =[], Yaxis=[], maxdepth2=[], pipelevel=[], 
-groundlevel=[], data=[],pipecoord=[],groundcoord=[],lenx=[],leny=[];
-var arr_valueFirst =[], arr_valueSecond =[], checkvalue1=[],checkvalue2=[],valueFirst=0, valueSecond=0
-var pipelength = 0, mark1 = 0, mark2 = 0
+groundlevel=[], data=[],pipecoord=[],groundcoord=[],lenx=[],leny=[], save_length=[], save_values=[];
+var arr_valueFirst =[], arr_valueSecond =[], valueFirst=0, valueSecond=0
+var pipelength = 0, mark1 = 0, mark2 = 0, shortcut = 0;
 
 const lengthbtn = document.querySelector("#length");
 const depthbtn = document.querySelector("#checkX");
@@ -105,6 +105,17 @@ lengthbtn.addEventListener('change',function(){
   }
 })
 
+//calculate pipelength
+function calc_length(arr_valueFirst, arr_valueSecond, valueFirst, valueSecond)
+{
+  var pix_diff = arr_valueSecond - arr_valueFirst;// 120 - 100 = 20
+  var val_diff =  valueSecond - valueFirst;//50 - 20 = 30
+  var pipedepth_to_pipelength = arr_valueSecond - pipecoord[mark1-1][0]; // 120 - 108 = 12
+  var value_total = (val_diff / pix_diff) * pipedepth_to_pipelength; // 30/20 = 1.5 * 12 = 18
+  var final_ans = valueSecond - value_total;
+  return final_ans
+}
+
 // get coordinate of x,y when click in the canvas, and what ever happen in the canvas. will be run in here
 const canvasElem = document.querySelector("canvas"); 
 canvasElem.addEventListener("mousedown", function(e)
@@ -182,6 +193,16 @@ canvasElem.addEventListener("mousedown", function(e)
         //draw horizontal line
         drawline(pipecoord[mark1-1][0], 0, pipecoord[mark1-1][0], 2000 )
       }
+
+      if (save_values.length > 0)
+      {
+        if((pipecoord[pipecoord.length-1][0] > save_length[save_length.length-1][0]) && (pipecoord[pipecoord.length-1][0] < save_length[save_length.length-1][1]))
+        {
+          drawcircle("green",pipecoord[pipecoord.length-1][0],pipecoord[pipecoord.length-1][1])
+          //this variable is used in calculate length
+          shortcut = 1
+        }        
+      }
     }
 
     else
@@ -202,12 +223,23 @@ canvasElem.addEventListener("mousedown", function(e)
           combine=[]
           groundcoord.push([coordX[lastx], coordY[lasty]])
           drawcircle("blue", coordX[lastx], coordY[lasty])
+          drawcircle("yellow",pipecoord[pipecoord.length-1][0],pipecoord[pipecoord.length-1][1])
           groundlevel.push(level(coordY[lasty]))
-          // console.log('groundlevel :',groundlevel)
-          if (pipelength == 0)
+          if (pipelength == 0 && shortcut == 0)
           {
             pipelength = prompt("Insert pipe length value")
           }
+
+          else
+          {
+            len = save_values.length - 1
+            console.log('save_values.length',save_values.length)
+            pipelength = calc_length(save_length[len][0], save_length[len][1], 
+              save_values[len][0],save_values[len][1])
+            console.log('pipelength',pipelength, '\nsave_length',save_length, '\nsave_values',save_values)
+            shortcut = 0
+          }
+          
           var combine =pipelevel.concat(groundlevel)
           data.push([combine[0],combine[1], Number(pipelength)])
           // console.log('data:',data)
@@ -257,23 +289,20 @@ canvasElem.addEventListener("mousedown", function(e)
         {
           if (arr_valueFirst.length == 0)
           {
+            
             arr_valueFirst.push(coordX[getcoord], coordY[getcoord]);
             valueFirst = Number(prompt("1st pipelength value"));
-			checkvalue1 = arr_valueFirst;
           }
 
           else
           {
             arr_valueSecond.push(coordX[getcoord], arr_valueFirst[1]);
-			checkvalue2 = arr_valueSecond;
             valueSecond = Number(prompt("2nd pipelength value"));
-            var pix_diff = arr_valueSecond[0] - arr_valueFirst[0];// 120 - 100 = 20
-            var val_diff =  valueSecond - valueFirst;//50 - 20 = 30
-            var pipedepth_to_pipelength = arr_valueSecond[0] - pipecoord[mark1-1][0]; // 120 - 108 = 12
-            var value_total = (val_diff / pix_diff) * pipedepth_to_pipelength; // 30/20 = 1.5 * 12 = 18
-            var final_ans = valueSecond - value_total;
-            pipelength = final_ans;
-            alert('pipe length value for that point is'+ pipelength.toFixed(2))
+            pipelength = calc_length(arr_valueFirst[0], arr_valueSecond[0], valueFirst, valueSecond);
+            //store x coordinate for length and its value
+            save_length.push([arr_valueFirst[0], arr_valueSecond[0]])
+            save_values.push([valueFirst, valueSecond])
+            alert('pipe length value for current point is '+ pipelength.toFixed(2))
             arr_valueFirst = [], arr_valueSecond=[]
             lengthbtn.checked= false, pointbtn.checked=true
           }                               
