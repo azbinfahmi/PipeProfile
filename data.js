@@ -1,11 +1,12 @@
 
 
 var coordX = [], coordY= [], Xaxis =[], Yaxis=[], maxdepth2=[], pipelevel=[], 
-groundlevel=[], data=[],pipecoord=[],groundcoord=[];
-var pipelength, mark1 = 0, mark2 = 0
+groundlevel=[], data=[],pipecoord=[],groundcoord=[],lenx=[],leny=[];
+var arr_valueFirst =[], arr_valueSecond =[], checkvalue1=[],checkvalue2=[],valueFirst=0, valueSecond=0
+var pipelength = 0, mark1 = 0, mark2 = 0
 
-
-const Xbtn = document.querySelector("#checkX");
+const lengthbtn = document.querySelector("#length");
+const depthbtn = document.querySelector("#checkX");
 const pointbtn = document.querySelector("#Points");
 //get coordinate when click
 function printMousePos(canvas, event) {
@@ -15,6 +16,8 @@ function printMousePos(canvas, event) {
   console.log("Coordinate x: " + x, "Coordinate y: " + y);
   coordX.push(x)
   coordY.push(y)
+  lenx.push(x)
+  leny.push(y)
   }
 
 //draw circle function
@@ -64,13 +67,18 @@ function level(y)
   return total
 }
 //alert when tick the depth point button
-Xbtn.addEventListener('change',function(){
-  if (Xbtn.checked == true)
+depthbtn.addEventListener('change',function(){
+  if (depthbtn.checked == true)
   {
     if(maxdepth2.length < 1)
     {
       alert("Click at the maximum depth point on the graph.")
     }
+  }
+
+  else
+  {
+    depthbtn.checked = true
   }
 })
 
@@ -78,16 +86,27 @@ Xbtn.addEventListener('change',function(){
 pointbtn.addEventListener('change',function(){
   if (pointbtn.checked == true)
   {
+    lengthbtn.checked = false
     if(maxdepth2.length != 2)
     {
       alert("Find the depth point first")
       pointbtn.checked = false
     }
   }
+  
+})
+
+//turn off point button when length button is clicked
+lengthbtn.addEventListener('change',function(){
+  if (lengthbtn.checked == true)
+  {
+    alert('click on the nearby pipe length value before and after the current pipe depth point')
+    pointbtn.checked = false
+  }
 })
 
 // get coordinate of x,y when click in the canvas, and what ever happen in the canvas. will be run in here
-let canvasElem = document.querySelector("canvas"); 
+const canvasElem = document.querySelector("canvas"); 
 canvasElem.addEventListener("mousedown", function(e)
 {
   printMousePos(canvasElem, e);
@@ -95,7 +114,7 @@ canvasElem.addEventListener("mousedown", function(e)
   //find the depth point
   if(maxdepth2.length < 2)
   {
-    if (Xbtn.checked == true)
+    if (depthbtn.checked == true)
     {
       var maxdepth=[]
       let bar = confirm('Confirm or deny');
@@ -123,13 +142,14 @@ canvasElem.addEventListener("mousedown", function(e)
           total_depth = maxdepth2[0][0] - maxdepth2[1][0]
           total_pixel = maxdepth2[1][2] - maxdepth2[0][2]
           calc = total_pixel / total_depth
-          console.log(maxdepth2)
+          // console.log(maxdepth2)
           for (var i= 1; i < total_depth ; i++ )
           {
             drawcircle("black", maxdepth2[0][1], maxdepth2[0][2] + (calc * i))
           }
           
           drawline(maxdepth2[0][1], maxdepth2[0][2], maxdepth2[1][1], maxdepth2[1][2])
+          
         }
       }     
     }
@@ -147,20 +167,20 @@ canvasElem.addEventListener("mousedown", function(e)
       if (bar == true)
       {
         mark1 =mark1+1
-        pipelevel=[]
+        
         pipe_check=[]
         pipecoord.push([coordX[lastx], coordY[lasty]])
         pipe_check.push([coordX[lastx], coordY[lasty]])
         drawcircle("yellow", coordX[lastx], coordY[lasty])
         pipelevel.push(level(coordY[lasty]))
-        console.log('pipelevel',pipelevel)
+        // console.log('pipelevel',pipelevel)
         if(pipecoord.length > 1)
         {
           drawline(pipecoord[mark1-2][0], pipecoord[mark1-2][1], pipecoord[mark1-1][0], pipecoord[mark1-1][1])
         }
 
         //draw horizontal line
-        drawline(pipecoord[mark1-1][0], 0, pipecoord[mark1-1][0], 20000 )
+        drawline(pipecoord[mark1-1][0], 0, pipecoord[mark1-1][0], 2000 )
       }
     }
 
@@ -183,12 +203,14 @@ canvasElem.addEventListener("mousedown", function(e)
           groundcoord.push([coordX[lastx], coordY[lasty]])
           drawcircle("blue", coordX[lastx], coordY[lasty])
           groundlevel.push(level(coordY[lasty]))
-          console.log('groundlevel :',groundlevel)
-          
-          pipelength = prompt("Insert pipe length value")
+          // console.log('groundlevel :',groundlevel)
+          if (pipelength == 0)
+          {
+            pipelength = prompt("Insert pipe length value")
+          }
           var combine =pipelevel.concat(groundlevel)
           data.push([combine[0],combine[1], Number(pipelength)])
-          console.log('data:',data)
+          // console.log('data:',data)
 
           //draw line for each point
           if(groundcoord.length > 1)
@@ -196,7 +218,7 @@ canvasElem.addEventListener("mousedown", function(e)
             drawline(groundcoord[mark1-2][0], groundcoord[mark1-2][1], groundcoord[mark1-1][0], groundcoord[mark1-1][1])
           }
 
-          //create table
+          //create table and insert data
           const table = document.getElementById("myTable");
           table_data = [data[mark1-1]]
           for (let i = 0; i < table_data.length; i++) {
@@ -210,11 +232,56 @@ canvasElem.addEventListener("mousedown", function(e)
               cell2.innerHTML = num.toFixed(2);
             }
           }
-          table_data = []
+          table_data = [],pipelevel=[],pipelength = 0
         }
       }
     }
   }
+
+  //find length based on last point
+  if (lengthbtn.checked == true)
+  {
+    getcoord = coordX.length -1
+    //calculate pipe length value automatically
+    if(pipelevel.length == 0)
+    {
+      alert('please insert pipe depth first')
+    }
+
+    else
+    {
+      if (coordY[getcoord] > pipecoord[pipecoord.length - 1][1])
+      {
+        let bar = confirm('Confirm or deny');
+        if (bar == true)
+        {
+          if (arr_valueFirst.length == 0)
+          {
+            arr_valueFirst.push(coordX[getcoord], coordY[getcoord]);
+            valueFirst = Number(prompt("1st pipelength value"));
+			checkvalue1 = arr_valueFirst;
+          }
+
+          else
+          {
+            arr_valueSecond.push(coordX[getcoord], arr_valueFirst[1]);
+			checkvalue2 = arr_valueSecond;
+            valueSecond = Number(prompt("2nd pipelength value"));
+            var pix_diff = arr_valueSecond[0] - arr_valueFirst[0];// 120 - 100 = 20
+            var val_diff =  valueSecond - valueFirst;//50 - 20 = 30
+            var pipedepth_to_pipelength = arr_valueSecond[0] - pipecoord[mark1-1][0]; // 120 - 108 = 12
+            var value_total = (val_diff / pix_diff) * pipedepth_to_pipelength; // 30/20 = 1.5 * 12 = 18
+            var final_ans = valueSecond - value_total;
+            pipelength = final_ans;
+            alert('pipe length value for that point is'+ pipelength.toFixed(2))
+            arr_valueFirst = [], arr_valueSecond=[]
+            lengthbtn.checked= false, pointbtn.checked=true
+          }                               
+        }
+      } 
+    }
+    
+  }            
 });
 
 //generate report
@@ -256,10 +323,10 @@ let saveFile = () =>
   }
 
 
-  console.log('newArr',newArr)
+  // console.log('newArr',newArr)
   var savedata1 = newArr.toString().replaceAll(",", "\t")
   var savedata1 = savedata1.toString().replaceAll(":\t", "")
-  console.log('savedata1:\n',savedata1)
+  // console.log('savedata1:\n',savedata1)
   let savedata2 ='p_level\t' + 'g_level\t' + 'length';
   const textToBLOB = new Blob([savedata2,savedata1], {type: 'text/plain'});
   const sFileName = prompt("Insert file name?")
@@ -294,9 +361,9 @@ let imgInput = document.getElementById('imageInput');
         myImage.onload = function(ev) {
           var myCanvas = document.getElementById("myCanvas"); // Creates a canvas object
           var myContext = myCanvas.getContext("2d"); // Creates a contect object
-          myCanvas.width = myImage.width *2 ; // Assigns image's width to canvas
+          myCanvas.width = myImage.width*2 ; // Assigns image's width to canvas
           myCanvas.height = myImage.height*2; // Assigns image's height to canvas
-          myContext.drawImage(myImage,0,0, myImage.width*2, myImage.height*2); // Draws the image on canvas
+          myContext.drawImage(myImage,0,0, myImage.width *2, myImage.height *2); // Draws the image on canvas
           let imgData = myCanvas.toDataURL("image/jpeg",2); // Assigns image base64 string in jpeg format to a variable
         }
       }

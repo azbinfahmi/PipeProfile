@@ -1,7 +1,27 @@
 html
 {
     background-color: powderblue;
+    margin:auto
 }
+
+#navbar
+{
+    list-style: none;
+    display: flex;
+    margin: 0;
+}
+
+
+.sticky
+{
+    position: fixed;
+    top: 4;
+    right: 0;
+    width: 320px;
+    background-color: rgb(150, 185, 215, 0.5);
+    border: 2px solid rgb(0, 0, 0);
+}
+
 
 .mini
 {
@@ -21,6 +41,8 @@ h1
 {
     display: flex;
 }
+
+
 .main
 {
     background-color: rgb(201, 194, 194);
@@ -36,7 +58,7 @@ ul
 {
     background-color: rgb(53, 185, 202);
     max-width: fit-content;
-    max-height: 500px;
+    max-height: 700px;
     padding: 0%;
     margin: 0%;
     border: 2px solid black;
@@ -45,8 +67,10 @@ ul
 
 li
 {
+    font-size: 20px;
+    padding: 20px;
     list-style: none;
-    padding: 10px;
+    font-size: 1.0em;
     
 }
 
@@ -76,4 +100,5 @@ td
     padding: 10px;
     text-align: center;
     border: 2px solid black;
+    
 }

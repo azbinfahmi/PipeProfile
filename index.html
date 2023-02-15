@@ -8,30 +8,39 @@
     <title>index</title>
 </head>
 <body>
+    <div class="sticky">
+        <ol id="navbar">
 
-    <div class="canvas_1">
-        <ul>
-            <h1>Pipe Profile Calculator</h1>
-            <li> <input type="file"  accept="image/jpeg, image/png" name="image" id="imageInput"></li>
-            <li> <input type="checkbox" id="checkX"> Depth point of the graph</li>
             <li> <input type="checkbox" id="Points"> Points</li>
-            <div style="overflow-y: scroll; height: 200px;">
-                <table id="myTable">
-                    <thead>
-                        <tr>
-                            <th>point_no</th>
-                            <th>p_depth</th>
-                            <th>g_depth</th>
-                            <th>length</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-            </table>
+            <li> <input type="checkbox" id="length"> Calculate length</li>
+        </ol>
+    </div>
+    <div class="canvas_1" id="canvas_1">
+        <div class="profile">
+            <ul>
+                <h1>Pipe Profile Calculator</h1>
+                <li> <input type="file"  accept="image/jpeg, image/png" name="image" id="imageInput"></li>
+                <li class="depth"> <input type="checkbox" id="checkX"> Depth point of the graph</li>
+
+                <div style="overflow-y: scroll; height: 200px;">
+                    <table id="myTable">
+                        <thead>
+                            <tr>
+                                <th>point_no</th>
+                                <th>p_depth</th>
+                                <th>g_depth</th>
+                                <th>length</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <li> <input type="button" id="bt" value="Generate Report" onclick="saveFile()" /></li>
+            </ul>
         </div>
-        <li> <input type="button" id="bt" value="Generate Report" onclick="saveFile()" /></li>
-        </ul>
         <h1 style="margin: 50px;"></h1>
-        <canvas class ="main", width="1000", height="700", id="myCanvas"></canvas>
+        <canvas class ="main", width="2000", height="700", id="myCanvas"></canvas>
     </div>
     
 
