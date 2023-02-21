@@ -10,18 +10,23 @@
 <body>
     <div class="sticky">
         <ol id="navbar">
-            <li> <input type="button" id="undo" value="Undo" /></li>
-            <li> <input type="checkbox" id="Points"> Points</li>
-            <li> <input type="checkbox" id="length"> Calculate length</li>
-            
+            <button style = "cursor: pointer;"class="tick" id="undo"> Undo</button>
+            <li class="tick"> <input type="checkbox" id="Points"> Points</li>
+            <li class="tick"> <input type="checkbox" id="length"> Calculate length</li>  
         </ol>
     </div>
+
+    <!-- <div class="layer">
+        <ol style="list-style: none;">
+            <li> <input type="checkbox" id="H_helper"> Horizontal Helper</li></li>
+        </ol>
+    </div> -->
     <div class="canvas_1" id="canvas_1">
         <div class="profile">
             <ul>
                 <h1>Pipe Profile Calculator</h1>
-                <li> <input type="file"  accept="image/jpeg, image/png" name="image" id="imageInput"></li>
-                <li class="depth"> <input type="checkbox" id="checkX"> Depth point of the graph</li>
+                <li class="list"> <input type="file"  accept="image/jpeg, image/png" name="image" id="imageInput"></li>
+                <li class="list"> <input type="checkbox" id="checkX"> Depth point of the graph</li>
                 <div style="overflow-y: scroll; height: 200px;">
                     <table id="myTable">
                         <thead>
@@ -37,16 +42,15 @@
                         </tbody>
                     </table>
                 </div>
-
-                <li> <input type="button" id="bt" value="Generate Report" onclick="saveFile()" /></li>
+                <li style="padding: 20px;"><button class="animated-button" id="bt" onclick="saveFile()"> Generate Report</button></li>
                 <footer>
-                    <p>&copy; 2023 Pipe Profile Calculator (Beta v1.4)</p>
+                    <p>&copy; 2023 Pipe Profile Calculator (Beta v1.41)</p>
                     <p> Developed by AzbinFahmi</p>
                 </footer>
             </ul>
         </div>
         <h1 style="margin: 50px;"></h1>
-        <canvas class ="main", width="2000", height="700", id="myCanvas"></canvas>
+        <canvas class ="main", width="1000", height="700", id="myCanvas"></canvas>
     </div>
 
     

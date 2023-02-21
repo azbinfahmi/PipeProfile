@@ -1,1 +1,115 @@
-var total_depth,total_pixel,calc,myImage,Scale,coordX=[],coordY=[],Xaxis=[],Yaxis=[],maxdepth2=[],pipelevel=[],groundlevel=[],data=[],pipecoord=[],groundcoord=[],lenx=[],leny=[],save_length=[],save_values=[],undoDepth=[],arr_valueFirst=[],arr_valueSecond=[],valueFirst=0,valueSecond=0,pipelength=0,mark1=0,mark2=0,shortcut=0;const undobtn=document.querySelector("#undo"),lengthbtn=document.querySelector("#length"),depthbtn=document.querySelector("#checkX"),pointbtn=document.querySelector("#Points"),canvasElem=document.getElementById("myCanvas"),ctx=canvasElem.getContext("2d");function Load_Image(){let e=document.getElementById("imageInput");e.addEventListener("change",function(e){var t;e.target.files&&(0==(Scale=Number(prompt("Add a scale to the image","1")))&&(scale=1),t=e.target.files[0],(e=new FileReader).readAsDataURL(t),e.onloadend=function(e){(myImage=new Image).src=e.target.result,myImage.onload=function(){var e=document.getElementById("myCanvas"),t=e.getContext("2d");e.width=myImage.width*Scale,e.height=myImage.height*Scale,t.drawImage(myImage,0,0,myImage.width*Scale,myImage.height*Scale)}})})}function printMousePos(e,t){var o=e.getBoundingClientRect(),e=t.clientX-o.left,o=t.clientY-o.top;console.log("Coordinate x: "+e,"Coordinate y: "+o),coordX.push(e),coordY.push(o),lenx.push(e),leny.push(o)}function drawcircle(e,t,o){var n=document.getElementById("myCanvas").getContext("2d");n.beginPath(),n.arc(t,o,4,0,2*Math.PI*2,!1),n.fillStyle=e,n.fill(),n.stroke()}function drawline(e,t,o,n){var a=document.getElementById("myCanvas");a.getContext&&((a=a.getContext("2d")).beginPath(),a.lineCap="round",a.moveTo(e,t),a.lineTo(o,n),a.stroke())}function level(e){total_depth=maxdepth2[0][0]-maxdepth2[1][0],total_pixel=maxdepth2[1][2]-maxdepth2[0][2],calc=total_pixel/total_depth;e-=maxdepth2[0][2];return maxdepth2[0][0]-e/calc}function depth_undo(){if(0==pipecoord.length&&0==groundcoord.length)pointbtn.checked=!1,lengthbtn.checked=!1,maxdepth2.pop(),1==maxdepth2.length&&drawcircle("black",maxdepth2[0][1],maxdepth2[0][2]);else{drawline(maxdepth2[0][1],maxdepth2[0][2],maxdepth2[1][1],maxdepth2[1][2]);for(var e=0;e<total_depth+1;e++)drawcircle("black",maxdepth2[0][1],maxdepth2[0][2]+calc*e)}}function point_undo(){if(mark2<mark1)pipelevel=[],pipecoord.pop(),--mark1;else if(mark1==mark2&&0<pipecoord.length){groundcoord.pop(),--mark2,data.pop();const o=document.getElementById("myTableBody");for(table_data=data;o.firstChild;)o.removeChild(o.firstChild);if(0<data.length)for(let t=0;t<table_data.length;t++){const n=o.insertRow(),a=n.insertCell(0);a.innerHTML=t+1;for(let e=0;e<table_data[t].length;e++){const l=n.insertCell(e+1);num=Math.round(100*table_data[t][e])/100,l.innerHTML=num.toFixed(2)}}}for(var e=0;e<groundcoord.length;e++)drawcircle("blue",groundcoord[e][0],groundcoord[e][1]),e!=groundcoord.length-1&&drawline(groundcoord[e+1][0],groundcoord[e+1][1],groundcoord[e][0],groundcoord[e][1]);for(e=0;e<pipecoord.length;e++)drawcircle("yellow",pipecoord[e][0],pipecoord[e][1]),e!=pipecoord.length-1&&drawline(pipecoord[e+1][0],pipecoord[e+1][1],pipecoord[e][0],pipecoord[e][1]),drawline(pipecoord[e][0],0,pipecoord[e][0],2e3);0<save_values.length&&0<pipecoord.length&&pipecoord[pipecoord.length-1][0]>save_length[save_length.length-1][0]&&pipecoord[pipecoord.length-1][0]<save_length[save_length.length-1][1]&&(mark1!=mark2&&drawcircle("green",pipecoord[pipecoord.length-1][0],pipecoord[pipecoord.length-1][1]),shortcut=1)}function calc_length(e,t,o,n){return n-(n-o)/(t-e)*(t-pipecoord[mark1-1][0])}function drawLine(e){ctx.beginPath(),ctx.moveTo(e,0),ctx.lineTo(e,canvasElem.height),ctx.stroke()}depthbtn.addEventListener("change",function(){1==pointbtn.checked||1==lengthbtn.checked||2==maxdepth2.length?depthbtn.checked=!0:maxdepth2.length<1&&alert("Click at the maximum depth point on the graph.")}),pointbtn.addEventListener("change",function(){1==pointbtn.checked&&(lengthbtn.checked=!1,2!=maxdepth2.length&&(alert("Find the depth point first"),pointbtn.checked=!1))}),lengthbtn.addEventListener("change",function(){1==lengthbtn.checked&&(2!=maxdepth2.length?(alert("Find the depth point first"),lengthbtn.checked=!1):pointbtn.checked=!1)}),undobtn.addEventListener("click",function(){var e=document.getElementById("myCanvas"),t=e.getContext("2d");t.clearRect(0,0,e.width,e.height),null!=myImage&&t.drawImage(myImage,0,0,myImage.width*Scale,myImage.height*Scale),0==maxdepth2.length&&alert("There is nothing to undo"),depth_undo(),point_undo()}),canvasElem.addEventListener("mousedown",function(e){if(printMousePos(canvasElem,e),maxdepth2.length<2&&1==depthbtn.checked){var t=[];if(1==confirm("Confirm or deny"))if(lastx=coordX.length-1,lasty=coordY.length-1,0==maxdepth2.length){var o=prompt("Enter max depth value");t.push(Number(o),coordX[lastx],coordY[lasty]),maxdepth2.push(t),drawcircle("black",coordX[lastx],coordY[lasty]),firstX=lastx,alert("Click at the minimum depth point on the graph.")}else{o=prompt("Enter min depth value");t.push(Number(o),coordX[firstX],coordY[lasty]),maxdepth2.push(t),drawcircle("black",coordX[firstX],coordY[lasty]),total_depth=maxdepth2[0][0]-maxdepth2[1][0],total_pixel=maxdepth2[1][2]-maxdepth2[0][2],calc=total_pixel/total_depth;for(var n=1;n<total_depth;n++)drawcircle("black",maxdepth2[0][1],maxdepth2[0][2]+calc*n);drawline(maxdepth2[0][1],maxdepth2[0][2],maxdepth2[1][1],maxdepth2[1][2])}}if(1==pointbtn.checked)if(lastx=coordX.length-1,lasty=coordY.length-1,mark1==mark2)1==confirm("Confirm or deny")&&(mark1+=1,pipecoord.push([coordX[lastx],coordY[lasty]]),drawcircle("yellow",coordX[lastx],coordY[lasty]),1<pipecoord.length&&drawline(pipecoord[mark1-2][0],pipecoord[mark1-2][1],pipecoord[mark1-1][0],pipecoord[mark1-1][1]),drawline(pipecoord[mark1-1][0],0,pipecoord[mark1-1][0],2e3)),0<save_values.length&&pipecoord[pipecoord.length-1][0]>save_length[save_length.length-1][0]&&pipecoord[pipecoord.length-1][0]<save_length[save_length.length-1][1]&&mark1!=mark2&&(drawcircle("green",pipecoord[pipecoord.length-1][0],pipecoord[pipecoord.length-1][1]),len=save_values.length-1,pipelength=calc_length(save_length[len][0],save_length[len][1],save_values[len][0],save_values[len][1]),alert("pipe length value for current point is "+pipelength.toFixed(2)),shortcut=1);else if(1==confirm("Confirm or deny"))if(coordX[lastx]>pipecoord[mark1-1][0]+3||coordX[lastx]<pipecoord[mark1-1][0]-3)alert("Please pinpoint ground level first");else{mark2+=1,groundlevel=[],t=[],groundcoord.push([coordX[lastx],coordY[lasty]]),drawcircle("blue",coordX[lastx],coordY[lasty]),drawcircle("yellow",pipecoord[pipecoord.length-1][0],pipecoord[pipecoord.length-1][1]),groundlevel.push(level(coordY[lasty])),0==pipelength&&0==shortcut?pipelength=prompt("Insert pipe length value"):(len=save_values.length-1,pipelength=calc_length(save_length[len][0],save_length[len][1],save_values[len][0],save_values[len][1]),shortcut=0),pipelevel.push(level(pipecoord[mark1-1][1]));t=pipelevel.concat(groundlevel);data.push([t[0],t[1],Number(pipelength)]),1<groundcoord.length&&drawline(groundcoord[mark1-2][0],groundcoord[mark1-2][1],groundcoord[mark1-1][0],groundcoord[mark1-1][1]);const a=document.getElementById("myTableBody");for(table_data=data;a.firstChild;)a.removeChild(a.firstChild);for(let t=0;t<table_data.length;t++){const l=a.insertRow(),r=l.insertCell(0);r.innerHTML=t+1;for(let e=0;e<table_data[t].length;e++){const d=l.insertCell(e+1);num=Math.round(100*table_data[t][e])/100,d.innerHTML=num.toFixed(2)}}pipelength=0,pipelevel=[]}1==lengthbtn.checked&&(getcoord=coordX.length-1,0<coordY[getcoord]&&1==confirm("Confirm or deny")&&(0==arr_valueFirst.length?(arr_valueFirst.push(coordX[getcoord],coordY[getcoord]),valueFirst=Number(prompt("1st pipelength value"))):(arr_valueSecond.push(coordX[getcoord],arr_valueFirst[1]),valueSecond=Number(prompt("2nd pipelength value")),0<pipecoord.length&&(pipelength=calc_length(arr_valueFirst[0],arr_valueSecond[0],valueFirst,valueSecond)),save_length.push([arr_valueFirst[0],arr_valueSecond[0]]),save_values.push([valueFirst,valueSecond]),arr_valueFirst=[],arr_valueSecond=[],lengthbtn.checked=!1,pointbtn.checked=!0)))});let saveFile=()=>{for(var e=[],t=[],o=[],n=0;n<data.length;n++){t=[];for(var a=0;a<data[n].length;a++)num=Math.round(100*data[n][a])/100,0==a?t.push("\n"+num.toFixed(2)):1==a?t.push(num.toFixed(2)):n==data.length-1&&a==data[n].length-1?t.push(num.toFixed(2)+":,"):t.push(num.toFixed(2)+":");o.push(t)}for(n=0;n<data.length;n++)e=e.concat(o[n]);var l=(l=e.toString().replaceAll(",","\t")).toString().replaceAll(":\t",""),r=new Blob(["p_level\tg_level\tlength",l],{type:"text/plain"}),l=prompt("Insert file name?");let d=document.createElement("a");d.download=l,null!=window.webkitURL?d.href=window.webkitURL.createObjectURL(r):(d.href=window.URL.createObjectURL(r),d.style.display="none",document.body.appendChild(d)),d.click()};Load_Image();
+var u=[],s=[],o=[],f=[],c=[],m=[],d=[],v=[],p=[],h=[],r=[],i=[],y=[],b=[];
+//for undo button
+var z=[];var g,x,w;var C=[],k=[],_=0,N=0;var I=0,M=0,B=0,F=0;var a,l;const e=document.querySelector("#undo");const P=document.querySelector("#length");const X=document.querySelector("#checkX");const A=document.querySelector("#Points");const E=document.getElementById("myCanvas");const t=E.getContext('2d');
+//Load and display the image into canvas
+function n(){let e=document.getElementById('imageInput');e.addEventListener('change',function(t){if(t.target.files){l=Number(prompt("Add a scale to the image","1"));if(l==0){scale=1}let e=t.target.files[0];//here we get the image file
+var n=new FileReader;n.readAsDataURL(e);n.onloadend=function(e){a=new Image;// Creates image object
+a.src=e.target.result;// Assigns converted image to image object
+a.onload=function(){var e=document.getElementById("myCanvas");// Creates a canvas object
+var t=e.getContext("2d");// Creates a contect object
+e.width=a.width*l;// Assigns image's width to canvas
+e.height=a.height*l;// Assigns image's height to canvas
+t.drawImage(a,0,0,a.width*l,a.height*l);// Draws the image on canvas
+}}}})}
+//get coordinate when click
+function D(e,t){let n=e.getBoundingClientRect();let a=t.clientX-n.left;let l=t.clientY-n.top;console.log("Coordinate x: "+a,"Coordinate y: "+l);u.push(a);s.push(l);r.push(a);i.push(l)}
+//draw circle function
+function T(e,t,n,a,l){numb=p.length;
+//draw circle
+var r=document.getElementById("myCanvas");var i=r.getContext("2d");i.beginPath();i.arc(t,n,4,0,2*Math.PI*2);i.fillStyle=e;i.fill();i.fillStyle="black";i.font="11px Arial";i.textAlign="center";if(a!=0){if(a==.5){}else{var o="p"+Number(a);i.fillText(o,t-22,n-10)}}else if(a==0){if(c.length==1){o=c[0][0]}else{o=c[0][0]-l}i.fillText(o,t-30,n+3)}i.stroke()}
+//draw line
+function R(e,t,n,a){var l=document.getElementById("myCanvas");if(l.getContext){var r=l.getContext("2d");
+// Begin the path
+r.beginPath();r.lineCap="round";
+// Starting point
+r.moveTo(e,t);
+// End point
+r.lineTo(n,a);
+// Stroke will make the line visible
+r.stroke()}}
+//levelling
+function j(e){g=c[0][0]-c[1][0];x=c[1][2]-c[0][2];w=x/g;var t=e-c[0][2];var n=c[0][0]-t/w;return n}
+//undo button for depth point
+function G(){if(p.length==0&&h.length==0){A.checked=false;P.checked=false;
+//delete last point of the array
+c.pop();if(c.length==1){T("black",c[0][1],c[0][2],0)}}else{R(c[0][1],c[0][2],c[1][1],c[1][2]);for(var e=0;e<g+1;e++){T("black",c[0][1],c[0][2]+w*e,0,e)}}}
+//undo for point
+function H(){if(M>B){
+//undo untuk pipe depth
+m=[];p.pop();M=M-1}else if(M==B&&p.length>0){
+//undo untuk ground depth
+h.pop();B=B-1;v.pop();const n=document.getElementById("myTableBody");table_data=v;while(n.firstChild){n.removeChild(n.firstChild)}if(v.length>0){for(let t=0;t<table_data.length;t++){const a=n.insertRow();const l=a.insertCell(0);l.innerHTML=t+1;for(let e=0;e<table_data[t].length;e++){const r=a.insertCell(e+1);num=Math.round(table_data[t][e]*100)/100;r.innerHTML=num.toFixed(2)}}}}for(var e=0;e<h.length;e++){T("blue",h[e][0],h[e][1],e+1);if(e!=h.length-1){R(h[e+1][0],h[e+1][1],h[e][0],h[e][1])}}for(var e=0;e<p.length;e++){T("yellow",p[e][0],p[e][1],e+1);
+//draw horizontal line
+if(e!=p.length-1){R(p[e+1][0],p[e+1][1],p[e][0],p[e][1])}R(p[e][0],0,p[e][0],2e3)}
+//check if point can be calculated
+if(b.length>0&&p.length>0){if(p[p.length-1][0]>y[y.length-1][0]&&p[p.length-1][0]<y[y.length-1][1]){if(M!=B){T("green",p[p.length-1][0],p[p.length-1][1],M)}
+//this variable is used in calculate length
+F=1}}}
+//calculate pipelength
+function q(e,t,n,a){var l=t-e;// 120 - 100 = 20
+var r=a-n;//50 - 20 = 30
+var i=t-p[M-1][0];// 120 - 108 = 12
+var o=r/l*i;// 30/20 = 1.5 * 12 = 18
+var f=a-o;return f}
+//alert when tick the depth point button
+X.addEventListener('change',function(){if(A.checked==true||P.checked==true){X.checked=true}else if(c.length==2){X.checked=true}else if(X.checked==true){if(c.length==0){alert("Click at the maximum depth point on the graph.")}else{alert("Click at the minimum depth point on the graph.")}}});
+//alert when tick the point button
+A.addEventListener('change',function(){if(A.checked==true){P.checked=false;if(c.length!=2){alert("Find the depth point first");A.checked=false;X.checked=true}}});
+//turn off point button when length button is clicked
+P.addEventListener('change',function(){if(P.checked==true){if(c.length!=2){alert("Find the depth point first");P.checked=false;X.checked=true}else{A.checked=false}}});
+//undo button
+e.addEventListener("click",function(){var e=document.getElementById('myCanvas');var t=e.getContext('2d');
+// clear the specific arc
+t.clearRect(0,0,e.width,e.height);
+// redraw Image
+if(a!=null){t.drawImage(a,0,0,a.width*l,a.height*l)}
+//undo the depth
+if(c.length==0){alert("Nothing to undo")}G();
+//undo point
+H()});function J(e){
+// Clear the canvas
+// Draw the line
+t.beginPath();t.moveTo(e,0);t.lineTo(e,E.height);t.stroke()}
+// get coordinate of x,y when click in the canvas, and what ever happen in the canvas. will be run in here
+E.addEventListener("mousedown",function(e){D(E,e);
+//find the depth point
+if(c.length<2){if(X.checked==true){var t=[];let e=confirm('Confirm or deny');if(e==true){lastx=u.length-1;lasty=s.length-1;if(c.length==0){var n=prompt("Enter max depth value");t.push(Number(n),u[lastx],s[lasty]);c.push(t);T("black",u[lastx],s[lasty],0);firstX=lastx;alert("Click at the minimum depth point on the graph.")}else{var n=prompt("Enter min depth value");t.push(Number(n),u[firstX],s[lasty]);c.push(t);
+//calculate high of the depth point
+g=c[0][0]-c[1][0];x=c[1][2]-c[0][2];w=x/g;
+// console.log(maxdepth2)
+for(var a=0;a<g+1;a++){T("black",c[0][1],c[0][2]+w*a,0,a)}R(c[0][1],c[0][2],c[1][1],c[1][2])}}}}
+//find the pipelevel, groundlevel and length
+if(A.checked==true){lastx=u.length-1;lasty=s.length-1;if(M==B){let e=confirm('Confirm or deny');if(e==true){M=M+1;p.push([u[lastx],s[lasty]]);T("yellow",u[lastx],s[lasty],M);
+// console.log('pipelevel',pipelevel)
+if(p.length>1){R(p[M-2][0],p[M-2][1],p[M-1][0],p[M-1][1])}
+//draw horizontal line
+R(p[M-1][0],0,p[M-1][0],E.height)}if(b.length>0){if(p[p.length-1][0]>y[y.length-1][0]&&p[p.length-1][0]<y[y.length-1][1]){if(M!=B){T("green",p[p.length-1][0],p[p.length-1][1],.5);len=b.length-1;I=q(y[len][0],y[len][1],b[len][0],b[len][1]);alert('pipe length value for current point is '+I.toFixed(2));F=1}
+//this variable is used in calculate length
+}}}else{let e=confirm('Confirm or deny');if(e==true){
+//check wheter the ground point is true or not
+if(u[lastx]>p[M-1][0]+3||u[lastx]<p[M-1][0]-3){alert("Please pinpoint ground level first")}else{B=B+1;d=[];l=[];h.push([u[lastx],s[lasty]]);T("blue",u[lastx],s[lasty],B);T("yellow",p[p.length-1][0],p[p.length-1][1],.5);d.push(j(s[lasty]));if(I==0&&F==0){I=prompt("Insert pipe length value")}else{len=b.length-1;I=q(y[len][0],y[len][1],b[len][0],b[len][1]);F=0}m.push(j(p[M-1][1]));
+//console.log('pipelevel',pipelevel)
+var l=m.concat(d);v.push([l[0],l[1],Number(I)]);
+// console.log('data:',data)
+//draw line for each point
+if(h.length>1){R(h[M-2][0],h[M-2][1],h[M-1][0],h[M-1][1])}
+//create table and insert data
+const r=document.getElementById("myTableBody");table_data=v;
+// Start removing from the last row to the first one
+while(r.firstChild){r.removeChild(r.firstChild)}for(let t=0;t<table_data.length;t++){const i=r.insertRow();const o=i.insertCell(0);o.innerHTML=t+1;for(let e=0;e<table_data[t].length;e++){const f=i.insertCell(e+1);num=Math.round(table_data[t][e]*100)/100;f.innerHTML=num.toFixed(2)}}I=0,m=[]}}}}
+//find length based on last point
+if(P.checked==true){getcoord=u.length-1;
+//calculate pipe length value automatically
+if(s[getcoord]>0){let e=confirm('Confirm or deny');if(e==true){if(C.length==0){C.push(u[getcoord],s[getcoord]);_=Number(prompt("1st pipelength value"))}else{k.push(u[getcoord],C[1]);while(N==0){N=Number(prompt("2nd pipelength value"));if(N==0){alert("Please insert pipelength value")}}if(p.length>0){I=q(C[0],k[0],_,N)}
+//store x coordinate for length and its value
+y.push([C[0],k[0]]);b.push([_,N]);C=[],k=[],N=0;P.checked=false,A.checked=true}}}}});
+//generate report
+let saveFile=()=>{var e=[],t=[],n=[];
+//convert array to \t
+for(var a=0;a<v.length;a++){t=[];for(var l=0;l<v[a].length;l++){num=Math.round(v[a][l]*100)/100;if(l==0){t.push('\n'+num.toFixed(2))}else if(l==1){t.push(num.toFixed(2))}else if(a==v.length-1&&l==v[a].length-1){t.push(num.toFixed(2)+':,')}else{t.push(num.toFixed(2)+':')}}n.push(t)}
+//convert to 1d array
+for(var a=0;a<v.length;a++){e=e.concat(n[a])}
+// console.log('newArr',newArr)
+var r=e.toString().replaceAll(",","\t");var r=r.toString().replaceAll(":\t","");
+// console.log('savedata1:\n',savedata1)
+let i='p_level\t'+'g_level\t'+'length';const o=new Blob([i,r],{type:'text/plain'});const f=prompt("Insert file name?");alert(v.length+" points have been exported");let u=document.createElement("a");u.download=f;if(window.webkitURL!=null){u.href=window.webkitURL.createObjectURL(o)}else{u.href=window.URL.createObjectURL(o);u.style.display="none";document.body.appendChild(u)}u.click()};n();
