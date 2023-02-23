@@ -12,13 +12,16 @@
         <ol id="navbar">
             <button style = "cursor: pointer;"class="tick" id="undo"> Undo</button>
             <li class="tick"> <input type="checkbox" id="Points"> Points</li>
-            <li class="tick"> <input type="checkbox" id="length"> Calculate length</li>  
+            <li class="tick"> <input type="checkbox" id="length"> Calculate length</li>
+            <li> <input type="checkbox" id="H_helper"> Vertical Line Assist</li>
+            <li> <input type="checkbox" id="L_helper"> Line to point Assist</li> 
         </ol>
     </div>
 
     <!-- <div class="layer">
         <ol style="list-style: none;">
-            <li> <input type="checkbox" id="H_helper"> Horizontal Helper</li></li>
+            <li> <input type="checkbox" id="H_helper"> Horizontal Assist</li>
+            <li> <input type="checkbox" id="L_helper"> Line Assist</li>
         </ol>
     </div> -->
     <div class="canvas_1" id="canvas_1">
@@ -44,12 +47,12 @@
                 </div>
                 <li style="padding: 20px;"><button class="animated-button" id="bt" onclick="saveFile()"> Generate Report</button></li>
                 <footer>
-                    <p>&copy; 2023 Pipe Profile Calculator (Beta v1.41)</p>
+                    <p>&copy; 2023 Pipe Profile Calculator (Beta v1.5)</p>
                     <p> Developed by AzbinFahmi</p>
                 </footer>
             </ul>
         </div>
-        <h1 style="margin: 50px;"></h1>
+        <h1 style="margin: 40px;"></h1>
         <canvas class ="main", width="1000", height="700", id="myCanvas"></canvas>
     </div>
 
