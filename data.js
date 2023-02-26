@@ -1,153 +1,1088 @@
-var u=[],s=[],t=[],f=[],c=[],m=[],d=[],v=[],p=[],b=[],r=[],o=[],g=[],h=[];
+var coordX = [], coordY= [], Xaxis =[], Yaxis=[], maxdepth2=[], pipelevel=[], 
+groundlevel=[], data=[],pipecoord=[],groundcoord=[],lenx=[],leny=[], save_length=[], save_values=[];
 //for undo button
-var j=[];var y,w,x;var _=[],C=[],k=0,N=0;var M=0,I=0,B=0,F=0;var l,a;const e=document.querySelector("#undo");const P=document.querySelector("#length");const X=document.querySelector("#checkX");const A=document.querySelector("#Points");const n=document.querySelector("#H_helper");const q=document.querySelector("#L_helper");const E=document.getElementById("myCanvas");const i=E.getContext('2d');
+var undoDepth =[]
+var total_depth, total_pixel,calc;
+var arr_valueFirst =[], arr_valueSecond =[], valueFirst=0, valueSecond=0
+var pipelength = 0, mark1 = 0, mark2 = 0, markclone1 =0, markclone2 = 0,  shortcut = 0;
+var myImage, Scale
+var edit_row = -1, del = -1
+const undobtn = document.querySelector("#undo");
+const lengthbtn = document.querySelector("#length");
+const depthbtn = document.querySelector("#checkX");
+const pointbtn = document.querySelector("#Points");
+const HHbtn = document.querySelector("#H_helper")
+const LHbtn = document.querySelector("#L_helper")
+const opnbtn = document.querySelector("#open")
+const editbtn = document.querySelector("#edit")
+const delbtn = document.querySelector("#delete")
+
+const canvasElem = document.getElementById("myCanvas");
+const ctx = canvasElem.getContext('2d');
 //Load and display the image into canvas
-function z(){let e=document.getElementById('imageInput');e.addEventListener('change',function(t){if(t.target.files){a=Number(prompt("Add a scale to the image","1"));if(a==0){scale=1}let e=t.target.files[0];//here we get the image file
-var n=new FileReader;n.readAsDataURL(e);n.onloadend=function(e){l=new Image;// Creates image object
-l.src=e.target.result;// Assigns converted image to image object
-l.onload=function(){var e=document.getElementById("myCanvas");// Creates a canvas object
-var t=e.getContext("2d");// Creates a contect object
-e.width=l.width*a;// Assigns image's width to canvas
-e.height=l.height*a;// Assigns image's height to canvas
-t.drawImage(l,0,0,l.width*a,l.height*a);// Draws the image on canvas
-}}}})}
+function Load_Image()
+{
+  let imgInput = document.getElementById('imageInput');
+  imgInput.addEventListener('change', function(e) {
+  if(e.target.files) 
+  {
+    Scale = Number(prompt("Add a scale to the image","1"))
+    if (Scale == 0)
+    {
+      scale = 1
+    }
+    let imageFile = e.target.files[0]; //here we get the image file
+    var reader = new FileReader();
+    reader.readAsDataURL(imageFile);
+    reader.onloadend = function (e) 
+    {
+      myImage = new Image(); // Creates image object
+      myImage.src = e.target.result; // Assigns converted image to image object
+      myImage.onload = function() {
+        var myCanvas = document.getElementById("myCanvas"); // Creates a canvas object
+        var myContext = myCanvas.getContext("2d"); // Creates a contect object
+        myCanvas.width = myImage.width*Scale ; // Assigns image's width to canvas
+        myCanvas.height = myImage.height*Scale; // Assigns image's height to canvas
+        myContext.drawImage(myImage,0,0, myImage.width *Scale, myImage.height *Scale); // Draws the image on canvas
+      }
+    }
+  }
+});
+}
+
 //get coordinate when click
-function D(e,t){let n=e.getBoundingClientRect();let l=t.clientX-n.left;let a=t.clientY-n.top;console.log("Coordinate x: "+l,"Coordinate y: "+a);u.push(l);s.push(a);r.push(l);o.push(a)}
+function printMousePos(canvas, event) {
+  let rect = canvas.getBoundingClientRect();
+  let x = event.clientX - rect.left;
+  let y = event.clientY - rect.top;
+  console.log("Coordinate x: " + x, "Coordinate y: " + y);
+  coordX.push(x)
+  coordY.push(y)
+  lenx.push(x)
+  leny.push(y)
+  }
+
 //draw circle function
-function T(e,t,n,l,a){numb=p.length;
-//draw circle
-var r=document.getElementById("myCanvas");var o=r.getContext("2d");o.beginPath();o.arc(t,n,4,0,2*Math.PI*2);o.fillStyle=e;o.fill();o.fillStyle="black";o.font="11px Arial";o.textAlign="center";if(l!=0){if(l==.5){}else{var i="p"+Number(l);o.fillText(i,t-22,n-10)}}else if(l==0){if(c.length==1){i=c[0][0]}else{i=c[0][0]-a}o.fillText(i,t-30,n+3)}o.stroke()}
+function drawcircle(color, a, b, no , i)
+{
+  //draw circle
+  var c = document.getElementById("myCanvas")
+  var ctx = c.getContext("2d");
+  ctx.beginPath();
+  ctx.arc(a, b, 4, 0, 2 * Math.PI*2);
+  ctx.fillStyle =color
+  ctx.fill()
+  ctx.fillStyle = "black";
+  ctx.font = "11px Arial";
+  ctx.textAlign = "center";
+  if( no  != 0)
+  {
+    if( no == 0.5)
+    {
+      
+    }
+
+    else
+    {
+      var name = "p" + Number(no)
+      ctx.fillText(name, a - 22, b-10 );
+    }
+    
+  }
+
+  else if ( no == 0)
+  {
+    if(maxdepth2.length == 1)
+    {
+      name = maxdepth2[0][0]
+    }
+
+    else
+    {
+      name = maxdepth2[0][0] - i
+    }
+   
+    ctx.fillText(name, a - 30, b + 3 );
+  }
+  
+  ctx.stroke();
+}
+
 //draw constant circle
-function G(e){let t=E.getBoundingClientRect();
-// Get mouse position
-var n=e.clientX-t.left;var l=e.clientY-t.top;if(I==B&&c.length==2&&A.checked==true){color="yellow"}else if(I>B&&c.length==2&&A.checked==true){color="blue"}else{color="black"}
-// Draw circle at mouse position
-radius=4;i.beginPath();i.fillStyle=color;i.arc(n,l,radius,0,2*Math.PI);i.fill()}
+function drawConstantCircle(event)
+{
+  let rect = canvasElem.getBoundingClientRect();
+  // Get mouse position
+  var mouseX = event.clientX - rect.left;
+  var mouseY = event.clientY - rect.top;
+
+  if ( mark1 == mark2 && maxdepth2.length == 2 && pointbtn.checked == true)
+  {
+    color= "yellow";
+
+    if(edit_row >= 0)
+    {
+      if(markclone1 > markclone2 && maxdepth2.length == 2 && pointbtn.checked == true)
+      {
+        color="blue"
+      }
+    }
+    
+  }
+
+  else if ( (mark1> mark2 && maxdepth2.length == 2 && pointbtn.checked == true) || (markclone1> markclone2 && maxdepth2.length == 2 && pointbtn.checked == true))
+  {
+    color= "blue";
+
+    if(edit_row >= 0)
+    {
+      if(markclone1 == markclone2 && maxdepth2.length == 2 && pointbtn.checked == true)
+      {
+        color="yellow"
+      }
+    }
+  }
+
+  else
+  {
+    color = "black"
+  }
+  // Draw circle at mouse position
+  radius = 4
+  ctx.beginPath();
+  ctx.fillStyle = color
+  ctx.arc(mouseX, mouseY, radius, 0, 2 * Math.PI);
+  ctx.fill();
+}
 //draw line
-function H(e,t,n,l){var a=document.getElementById("myCanvas");if(a.getContext){var r=a.getContext("2d");
-// Begin the path
-r.beginPath();r.lineCap="round";
-// Starting point
-r.moveTo(e,t);
-// End point
-r.lineTo(n,l);
-// Stroke will make the line visible
-r.stroke()}}
+function drawline(x1,y1,x2,y2)
+{
+  var c = document.getElementById("myCanvas")
+  if (c.getContext)
+  {
+    var context = c.getContext("2d");
+    // Begin the path
+    context.beginPath();
+
+    context.lineCap = "round";
+    // Starting point
+    context.moveTo(x1, y1);
+
+    // End point
+    context.lineTo(x2, y2);
+
+    // Stroke will make the line visible
+    context.stroke();
+
+  }
+}
+
 //draw horrizontal line
-function J(e){
-// Draw the line
-i.beginPath();i.moveTo(e,0);i.lineTo(e,E.height);i.stroke()}
+function drawLine(x) {
+  // Draw the line
+  ctx.beginPath();
+  ctx.moveTo(x, 0);
+  ctx.lineTo(x, canvasElem.height);
+  ctx.stroke();
+}
+
 //draw point to next point
-function K(e){let t=E.getBoundingClientRect();var n=e.clientX-t.left;var l=e.clientY-t.top;leng1=p.length-1;leng2=b.length-1;if(B>0){if(I==B){i.beginPath();i.moveTo(p[leng1][0],p[leng1][1]);i.lineTo(n,l);i.stroke()}else{i.beginPath();i.moveTo(b[leng2][0],b[leng2][1]);i.lineTo(n,l);i.stroke()}}}
+function drawpoint_to_point(event)
+{
+  let rect = canvasElem.getBoundingClientRect();
+  var mouseX = event.clientX - rect.left;
+  var mouseY = event.clientY - rect.top;
+
+  leng1 = pipecoord.length - 1
+  leng2 = groundcoord.length - 1
+
+  if ( edit_row >= 0)
+  {
+    if(edit_row == 0)
+    {
+      if (markclone1 == markclone2)
+      {
+        if(edit_row < pipecoord.length)
+        {
+          ctx.beginPath();
+          ctx.moveTo(pipecoord[edit_row +1 ][0], pipecoord[edit_row + 1][1]);
+          ctx.lineTo(mouseX, mouseY);
+          ctx.stroke();
+        }
+      }
+
+      else
+      {
+        if(edit_row<groundcoord.length)
+        {
+          ctx.beginPath();
+          ctx.moveTo(groundcoord[edit_row +1 ][0], groundcoord[edit_row + 1][1]);
+          ctx.lineTo(mouseX, mouseY);
+          ctx.stroke();
+        }
+      }
+    }
+
+    else if (edit_row != 0)
+    {
+      if(markclone1 == markclone2)
+      {
+        ctx.beginPath();
+        ctx.moveTo(pipecoord[edit_row -1 ][0], pipecoord[edit_row - 1][1]);
+        ctx.lineTo(mouseX, mouseY);
+        ctx.stroke();
+
+        if( edit_row +1 < pipecoord.length)
+        {
+          ctx.beginPath();
+          ctx.moveTo(pipecoord[edit_row +1 ][0], pipecoord[edit_row + 1][1]);
+          ctx.lineTo(mouseX, mouseY);
+          ctx.stroke();
+        }
+        
+      }
+
+      else
+      {
+        ctx.beginPath();
+        ctx.moveTo(groundcoord[edit_row -1 ][0], groundcoord[edit_row - 1][1]);
+        ctx.lineTo(mouseX, mouseY);
+        ctx.stroke();
+
+        if(edit_row +1 < groundcoord.length)
+        {
+          ctx.beginPath();
+          ctx.moveTo(groundcoord[edit_row +1 ][0], groundcoord[edit_row + 1][1]);
+          ctx.lineTo(mouseX, mouseY);
+          ctx.stroke();
+        }
+        
+      }
+    }
+    
+  }
+
+  else if ( mark2 > 0)
+  {
+    if ( mark1 == mark2)
+    {
+      ctx.beginPath();
+      ctx.moveTo(pipecoord[leng1][0], pipecoord[leng1][1]);
+      ctx.lineTo(mouseX, mouseY);
+      ctx.stroke();
+    }
+
+    else
+    {
+      ctx.beginPath();
+      ctx.moveTo(groundcoord[leng2][0], groundcoord[leng2][1]);
+      ctx.lineTo(mouseX, mouseY);
+      ctx.stroke();
+    }
+  }
+
+
+}
 //levelling
-function L(e){y=c[0][0]-c[1][0];w=c[1][2]-c[0][2];x=w/y;var t=e-c[0][2];var n=c[0][0]-t/x;return n}
+function level(y)
+{
+  total_depth = maxdepth2[0][0] - maxdepth2[1][0]
+  total_pixel = maxdepth2[1][2] - maxdepth2[0][2]
+  calc = total_pixel / total_depth
+  var value = y- maxdepth2[0][2]
+  var total = maxdepth2[0][0] - (value / calc)
+  return total
+}
+
 //undo button for depth point
-function O(){if(p.length==0&&b.length==0){A.checked=false;P.checked=false;
-//delete last point of the array
-c.pop();if(c.length==1){T("black",c[0][1],c[0][2],0)}}else{H(c[0][1],c[0][2],c[1][1],c[1][2]);for(var e=0;e<y+1;e++){T("black",c[0][1],c[0][2]+x*e,0,e)}}}
+function depth_undo()
+{
+  if (pipecoord.length == 0 && groundcoord.length == 0)
+  {
+    pointbtn.checked = false
+    lengthbtn.checked = false
+    //delete last point of the array
+    maxdepth2.pop()
+    if (maxdepth2.length == 1)
+    {
+      drawcircle("black", maxdepth2[0][1], maxdepth2[0][2], 0)
+    }
+  }
+
+  else 
+  {
+    drawline(maxdepth2[0][1], maxdepth2[0][2], maxdepth2[1][1], maxdepth2[1][2])
+    for (var i= 0; i < total_depth + 1 ; i++ )
+    {
+      drawcircle("black", maxdepth2[0][1], maxdepth2[0][2] + (calc * i), 0 ,i)
+    }
+  }
+}
 //undo for point
-function Q(){if(I>B){
-//undo untuk pipe depth
-m=[];p.pop();I=I-1}else if(I==B&&p.length>0){
-//undo untuk ground depth
-b.pop();B=B-1;v.pop();const n=document.getElementById("myTableBody");table_data=v;while(n.firstChild){n.removeChild(n.firstChild)}if(v.length>0){for(let t=0;t<table_data.length;t++){const l=n.insertRow();const a=l.insertCell(0);a.innerHTML=t+1;for(let e=0;e<table_data[t].length;e++){const r=l.insertCell(e+1);num=Math.round(table_data[t][e]*100)/100;r.innerHTML=num.toFixed(2)}}}}for(var e=0;e<b.length;e++){T("blue",b[e][0],b[e][1],e+1);if(e!=b.length-1){H(b[e+1][0],b[e+1][1],b[e][0],b[e][1])}}for(var e=0;e<p.length;e++){T("yellow",p[e][0],p[e][1],e+1);
-//draw horizontal line
-if(e!=p.length-1){H(p[e+1][0],p[e+1][1],p[e][0],p[e][1])}H(p[e][0],0,p[e][0],E.height)}
-//check if point can be calculated
-if(h.length>0&&p.length>0){if(p[p.length-1][0]>g[g.length-1][0]&&p[p.length-1][0]<g[g.length-1][1]){if(I!=B){T("green",p[p.length-1][0],p[p.length-1][1],I)}
-//this variable is used in calculate length
-F=1}}}function R(e,t,n,l){var a=t-e;// 120 - 100 = 20
-var r=l-n;//50 - 20 = 30
-var o=t-p[I-1][0];// 120 - 108 = 12
-var i=r/a*o;// 30/20 = 1.5 * 12 = 18
-var f=l-i;return f}
+function point_undo()
+{
+  if (edit_row >= 0)
+  {
+    if (markclone1 > markclone2)
+    {
+      pipecoord[edit_row] = []
+      markclone1 = markclone2
+    }
+  }
+
+  else
+  {
+    if (mark1 > mark2)
+    {
+      //undo untuk pipe depth
+      pipelevel = []
+      pipecoord.pop()
+      mark1 = mark1 - 1   
+    }
+
+    else if (mark1 == mark2 && pipecoord.length > 0)
+    {
+      //undo untuk ground depth
+      groundcoord.pop()
+      mark2 = mark2 - 1
+      data.pop()
+      const tableBody = document.getElementById("myTableBody");
+      table_data = data
+
+      while(tableBody.firstChild)
+      {
+        tableBody.removeChild(tableBody.firstChild);
+      }
+      if(data.length > 0)
+      {
+        for (let i = 0; i < table_data.length; i++) 
+        {
+          const row = tableBody.insertRow();
+          const cell1 = row.insertCell(0);
+          cell1.innerHTML = i+1;
+          
+          for (let j = 0; j < table_data[i].length; j++) {
+            const cell2 = row.insertCell(j+1);
+            num = Math.round(table_data[i][j] * 100) / 100
+            cell2.innerHTML = num.toFixed(2);
+          }
+        }
+      }
+    }
+  }
+  
+  for (var i = 0; i < groundcoord.length; i ++)
+  {
+    drawcircle("blue", groundcoord[i][0], groundcoord[i][1], i +1 )
+    if (i!= groundcoord.length - 1)
+    {
+      drawline(groundcoord[i+1][0], groundcoord[i+1][1], groundcoord[i][0], groundcoord[i][1])
+    }
+  }
+
+  for ( var i = 0; i < pipecoord.length; i++)
+  {
+    drawcircle("yellow", pipecoord[i][0], pipecoord[i][1], i +1)
+    //draw horizontal line
+    if( i != pipecoord.length - 1)
+    {
+      drawline(pipecoord[i+1][0], pipecoord[i+1][1], pipecoord[i][0], pipecoord[i][1])
+
+    }
+    drawline(pipecoord[i][0], 0, pipecoord[i][0], canvasElem.height )
+  }
+
+  //check if point can be calculated
+  if (save_values.length > 0 && pipecoord.length > 0)
+  {
+    
+    if((pipecoord[pipecoord.length-1][0] > save_length[save_length.length-1][0]) && (pipecoord[pipecoord.length-1][0] < save_length[save_length.length-1][1]))
+    {
+      if(mark1!= mark2)
+      {
+        drawcircle("green",pipecoord[pipecoord.length-1][0],pipecoord[pipecoord.length-1][1], mark1)
+      }
+      //this variable is used in calculate length
+      shortcut = 1
+    }        
+  }
+}
+
+function calc_length(arr_valueFirst, arr_valueSecond, valueFirst, valueSecond)
+{
+  var pix_diff = arr_valueSecond - arr_valueFirst;// 120 - 100 = 20
+  var val_diff =  valueSecond - valueFirst;//50 - 20 = 30
+  var pipedepth_to_pipelength = arr_valueSecond - pipecoord[mark1-1][0]; // 120 - 108 = 12
+  var value_total = (val_diff / pix_diff) * pipedepth_to_pipelength; // 30/20 = 1.5 * 12 = 18
+  var final_ans = valueSecond - value_total;
+  return final_ans
+}
+
+//calculate length for edited table
+function calc_length_edit(arr_valueFirst, arr_valueSecond, valueFirst, valueSecond)
+{
+  var pix_diff = arr_valueSecond - arr_valueFirst;// 120 - 100 = 20
+  var val_diff =  valueSecond - valueFirst;//50 - 20 = 30
+  var pipedepth_to_pipelength = arr_valueSecond - pipecoord[edit_row][0]; // 120 - 108 = 12
+  var value_total = (val_diff / pix_diff) * pipedepth_to_pipelength; // 30/20 = 1.5 * 12 = 18
+  var final_ans = valueSecond - value_total;
+  return final_ans
+}
+
 //redraw everything
-function S(){
-//draw the inserted image
-if(a>0){i.drawImage(l,0,0,l.width*a,l.height*a)}
-//draw depth point scale
-if(c.length>0){if(c.length==1){T("black",c[0][1],c[0][2],0)}else{H(c[0][1],c[0][2],c[1][1],c[1][2]);for(var e=0;e<y+1;e++){T("black",c[0][1],c[0][2]+x*e,0,e)}}}for(var e=0;e<b.length;e++){T("blue",b[e][0],b[e][1],e+1);if(e!=b.length-1){H(b[e+1][0],b[e+1][1],b[e][0],b[e][1])}}for(var e=0;e<p.length;e++){T("yellow",p[e][0],p[e][1],e+1);
-//draw horizontal line
-if(e!=p.length-1){H(p[e+1][0],p[e+1][1],p[e][0],p[e][1])}H(p[e][0],0,p[e][0],E.height)}
-//check if point can be calculated
-if(h.length>0&&p.length>0){if(p[p.length-1][0]>g[g.length-1][0]&&p[p.length-1][0]<g[g.length-1][1]){if(I!=B){T("green",p[p.length-1][0],p[p.length-1][1],I)}
-//this variable is used in calculate length
-F=1}}}
+function redraw()
+{
+
+  //draw the inserted image
+  if (Scale > 0)
+  {
+    ctx.drawImage(myImage,0,0, myImage.width *Scale, myImage.height *Scale);
+  }
+  //draw depth point scale
+  if (maxdepth2.length > 0)
+  {
+    if (maxdepth2.length == 1)
+    {
+      drawcircle("black", maxdepth2[0][1], maxdepth2[0][2],0)
+    }
+    else 
+    {
+      drawline(maxdepth2[0][1], maxdepth2[0][2], maxdepth2[1][1], maxdepth2[1][2])
+      for (var i= 0; i < total_depth + 1 ; i++ )
+      {
+        drawcircle("black", maxdepth2[0][1], maxdepth2[0][2] + (calc * i), 0,i)
+      }
+    }
+  }
+
+  for ( var i = 0; i < pipecoord.length; i++)
+  {
+    drawcircle("yellow", pipecoord[i][0], pipecoord[i][1], i +1)
+    //draw horizontal line
+    if( i != pipecoord.length - 1)
+    {
+      drawline(pipecoord[i+1][0], pipecoord[i+1][1], pipecoord[i][0], pipecoord[i][1])
+
+    }
+    drawline(pipecoord[i][0], 0, pipecoord[i][0], canvasElem.height )
+  }
+
+  for (var i = 0; i < groundcoord.length; i ++)
+  {
+    drawcircle("blue", groundcoord[i][0], groundcoord[i][1], i +1 )
+    if (i!= groundcoord.length - 1)
+    {
+      drawline(groundcoord[i+1][0], groundcoord[i+1][1], groundcoord[i][0], groundcoord[i][1])
+    }
+  }
+
+  //check if point can be calculated
+  if (save_values.length > 0 && pipecoord.length > 0)
+  {
+    if((pipecoord[pipecoord.length-1][0] > save_length[save_length.length-1][0]) && (pipecoord[pipecoord.length-1][0] < save_length[save_length.length-1][1]))
+    {
+      if(mark1!= mark2)
+      {
+        drawcircle("green",pipecoord[pipecoord.length-1][0],pipecoord[pipecoord.length-1][1], mark1)
+      }
+      //this variable is used in calculate length
+      shortcut = 1
+    }
+    
+    if(edit_row >= 0)
+    {
+      if((pipecoord[edit_row][0] > save_length[save_length.length-1][0]) && (pipecoord[edit_row][0] < save_length[save_length.length-1][1]))
+      {
+        if(markclone1!= markclone2)
+        {
+          drawcircle("green",pipecoord[edit_row][0],pipecoord[edit_row][1], edit_row +1)
+        }
+        //this variable is used in calculate length
+        shortcut = 1
+      }
+    }
+  }
+}
+
 //alert when tick the depth point button
-X.addEventListener('change',function(){if(A.checked==true||P.checked==true){X.checked=true}else if(c.length==2){X.checked=true}else if(X.checked==true){
-// if (maxdepth2.length == 0)
-// {
-//   alert("Click at the maximum depth point on the graph.")
-// }
-// else
-// {
-//   alert("Click at the minimum depth point on the graph.")
-// }
-}});
+depthbtn.addEventListener('change',function(){
+
+  if (pointbtn.checked == true || lengthbtn.checked == true)
+  {
+    depthbtn.checked = true
+  }
+
+  else if (maxdepth2.length == 2)
+  {
+    depthbtn.checked = true
+  }
+
+  
+  else if(depthbtn.checked == true)
+  {
+    // if (maxdepth2.length == 0)
+    // {
+    //   alert("Click at the maximum depth point on the graph.")
+    // }
+
+    // else
+    // {
+    //   alert("Click at the minimum depth point on the graph.")
+    // }
+  }
+
+})
+
 //alert when tick the point button
-A.addEventListener('change',function(){if(A.checked==true){P.checked=false;if(c.length!=2){alert("Find the depth point first");A.checked=false;X.checked=true}}});
+pointbtn.addEventListener('change',function(){
+  if (pointbtn.checked == true)
+  {
+    lengthbtn.checked = false
+    if(maxdepth2.length != 2)
+    {
+      alert("Find the depth point first")
+      pointbtn.checked = false
+      depthbtn.checked = true
+    }
+  }
+  
+})
+
 //turn off point button when length button is clicked
-P.addEventListener('change',function(){if(P.checked==true){if(c.length!=2){alert("Find the depth point first");P.checked=false;X.checked=true}else{A.checked=false}}});
+lengthbtn.addEventListener('change',function(){
+  if (lengthbtn.checked == true)
+  {
+    if(maxdepth2.length != 2)
+    {
+      alert("Find the depth point first")
+      lengthbtn.checked = false
+      depthbtn.checked = true
+    }
+    else
+    {
+      pointbtn.checked = false
+    }
+    
+  }
+})
+
 //undo button
-e.addEventListener("click",function(){var e=document.getElementById('myCanvas');var t=e.getContext('2d');
-// clear the specific arc
-t.clearRect(0,0,e.width,e.height);
-// redraw Image
-if(l!=null){t.drawImage(l,0,0,l.width*a,l.height*a)}
-//undo the depth
-if(c.length==0){alert("Nothing to undo")}O();
-//undo point
-Q()});
+undobtn.addEventListener("click", function(){
+
+  var canvas = document.getElementById('myCanvas');
+  var ctx = canvas.getContext('2d');
+  // clear the specific arc
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // redraw Image
+  if(myImage != null)
+  {
+    ctx.drawImage(myImage,0,0, myImage.width *Scale, myImage.height *Scale);
+  }
+  //undo the depth
+  if (maxdepth2.length == 0)
+  {
+    alert("Nothing to undo")
+  }
+
+  depth_undo()
+
+  //undo point
+  point_undo()
+});
+
+//edit point
+editbtn.addEventListener("click", function(){
+  edit_row = -1
+  edit_row = prompt("Edit Point no?") - 1
+
+  if (edit_row >= data.length)
+  {
+    alert("Point does not exist")
+    edit_row = -1
+  }
+
+  else if ( edit_row < 0)
+  {
+    alert("Point does not exist")
+    edit_row = -1
+  }
+
+  else
+  {
+    pipecoord[edit_row] = []
+    groundcoord[edit_row] =[]
+    data[edit_row] = []
+    ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
+    redraw()
+  }
+
+})
+
+//delete point
+delbtn.addEventListener("click", function(){
+  del = -1
+  del = prompt("Delete point no?") - 1
+  if (del >= data.length)
+  {
+    alert("Point does not exist")
+    del = -1
+  }
+
+  else if ( del < 0)
+  {
+    alert("Point does not exist")
+    del = -1
+  }
+
+  else
+  {
+    pipecoord.splice(del,1)
+    groundcoord.splice(del,1)
+    data.splice(del,1)
+    const tableBody = document.getElementById("myTableBody");
+    table_data = data
+  
+    while(tableBody.firstChild)
+    {
+      tableBody.removeChild(tableBody.firstChild);
+    }
+    if(data.length > 0)
+    {
+      for (let i = 0; i < table_data.length; i++) 
+      {
+        const row = tableBody.insertRow();
+        const cell1 = row.insertCell(0);
+        cell1.innerHTML = i+1;
+        
+        for (let j = 0; j < table_data[i].length; j++) {
+          const cell2 = row.insertCell(j+1);
+          num = Math.round(table_data[i][j] * 100) / 100
+          cell2.innerHTML = num.toFixed(2);
+        }
+      }
+    }
+    mark1 = mark1 - 1
+    mark2 = mark2 - 1
+    redraw()
+  }
+  
+})
+
 //make vertical line
-E.addEventListener('mousemove',function(e){
-//horrizontal line
-const t=e.offsetX;i.clearRect(0,0,E.width,E.height);S();if(X.checked==true){G(e)}
-//horinzontal assist
-if(n.checked==true){i.beginPath();i.moveTo(t,0);i.lineTo(t,E.height);i.stroke()}if(q.checked==true&&A.checked==true){K(e)}});
+canvasElem.addEventListener('mousemove', function(event) {
+
+  //horrizontal line
+  const x = event.offsetX;
+  ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
+  redraw()
+  if (depthbtn.checked == true)
+  { 
+    drawConstantCircle(event)
+  }
+  //horinzontal assist
+  if (HHbtn.checked == true)
+  {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, canvasElem.height);
+    ctx.stroke();
+  }
+
+  if(LHbtn.checked == true && pointbtn.checked == true)
+  {
+    drawpoint_to_point(event)
+  }
+});
+
 // get coordinate of x,y when click in the canvas, and what ever happen in the canvas. will be run in here
-E.addEventListener("mousedown",function(e){D(E,e);
-//find the depth point
-if(c.length<2){if(X.checked==true){var t=[];let e=confirm('Confirm or deny');if(e==true){lastx=u.length-1;lasty=s.length-1;if(c.length==0){var n=prompt("Enter max depth value");t.push(Number(n),u[lastx],s[lasty]);c.push(t);T("black",u[lastx],s[lasty],0);firstX=lastx;
-// alert("Click at the minimum depth point on the graph.")
-}else{var n=prompt("Enter min depth value");t.push(Number(n),u[firstX],s[lasty]);c.push(t);
-//calculate high of the depth point
-y=c[0][0]-c[1][0];w=c[1][2]-c[0][2];x=w/y;
-// console.log(maxdepth2)
-for(var l=0;l<y+1;l++){T("black",c[0][1],c[0][2]+x*l,0,l)}H(c[0][1],c[0][2],c[1][1],c[1][2])}}}}
-//find the pipelevel, groundlevel and length
-if(A.checked==true){lastx=u.length-1;lasty=s.length-1;if(I==B){let e=confirm('Confirm or deny');if(e==true){I=I+1;p.push([u[lastx],s[lasty]]);T("yellow",u[lastx],s[lasty],I);
-// console.log('pipelevel',pipelevel)
-if(p.length>1){H(p[I-2][0],p[I-2][1],p[I-1][0],p[I-1][1])}
-//draw horizontal line
-H(p[I-1][0],0,p[I-1][0],E.height)}if(h.length>0){if(p[p.length-1][0]>g[g.length-1][0]&&p[p.length-1][0]<g[g.length-1][1]){if(I!=B){T("green",p[p.length-1][0],p[p.length-1][1],.5);len=h.length-1;M=R(g[len][0],g[len][1],h[len][0],h[len][1]);
-// alert('pipe length value for current point is '+ pipelength.toFixed(2))
-F=1}
-//this variable is used in calculate length
-}}}else{let e=confirm('Confirm or deny');if(e==true){
-//check wheter the ground point is true or not
-if(u[lastx]>p[I-1][0]+3||u[lastx]<p[I-1][0]-3){alert("Please pinpoint ground level first")}else{B=B+1;d=[];a=[];b.push([u[lastx],s[lasty]]);T("blue",u[lastx],s[lasty],B);T("yellow",p[p.length-1][0],p[p.length-1][1],.5);d.push(L(s[lasty]));if(M==0&&F==0){M=prompt("Insert pipe length value")}else{len=h.length-1;M=R(g[len][0],g[len][1],h[len][0],h[len][1]);F=0}m.push(L(p[I-1][1]));
-//console.log('pipelevel',pipelevel)
-var a=m.concat(d);v.push([a[0],a[1],Number(M)]);
-// console.log('data:',data)
-//draw line for each point
-if(b.length>1){H(b[I-2][0],b[I-2][1],b[I-1][0],b[I-1][1])}
-//create table and insert data
-const r=document.getElementById("myTableBody");table_data=v;
-// Start removing from the last row to the first one
-while(r.firstChild){r.removeChild(r.firstChild)}for(let t=0;t<table_data.length;t++){const o=r.insertRow();const i=o.insertCell(0);i.innerHTML=t+1;for(let e=0;e<table_data[t].length;e++){const f=o.insertCell(e+1);num=Math.round(table_data[t][e]*100)/100;f.innerHTML=num.toFixed(2)}}M=0,m=[]}}}}
-//find length based on last point
-if(P.checked==true){getcoord=u.length-1;
-//calculate pipe length value automatically
-if(s[getcoord]>0){let e=confirm('Confirm or deny');if(e==true){if(_.length==0){_.push(u[getcoord],s[getcoord]);k=Number(prompt("1st pipelength value"))}else{C.push(u[getcoord],_[1]);while(N==0){N=Number(prompt("2nd pipelength value"));if(N==0){alert("Please insert pipelength value")}}if(p.length>0){M=R(_[0],C[0],k,N)}
-//store x coordinate for length and its value
-g.push([_[0],C[0]]);h.push([k,N]);_=[],C=[],N=0;P.checked=false,A.checked=true}}}}});
+canvasElem.addEventListener("mousedown", function(e)
+{
+  printMousePos(canvasElem, e);
+  //find the depth point
+  if(maxdepth2.length < 2)
+  {
+    if (depthbtn.checked == true)
+    {
+      var maxdepth=[]
+      let bar = confirm('Confirm or deny');
+      if (bar == true)
+      {
+        lastx = coordX.length - 1
+        lasty = coordY.length - 1
+        if (maxdepth2.length == 0)
+        {
+          var depth = prompt("Enter max depth value")
+          maxdepth.push(Number(depth), coordX[lastx], coordY[lasty])
+          maxdepth2.push(maxdepth)
+          drawcircle("black", coordX[lastx], coordY[lasty], 0)
+          firstX = lastx
+          // alert("Click at the minimum depth point on the graph.")
+        }
+        else
+        {
+          var depth = prompt("Enter min depth value")
+          maxdepth.push(Number(depth), coordX[firstX], coordY[lasty])
+          maxdepth2.push(maxdepth)
+
+          //calculate high of the depth point
+          total_depth = maxdepth2[0][0] - maxdepth2[1][0]
+          total_pixel = maxdepth2[1][2] - maxdepth2[0][2]
+          calc = total_pixel / total_depth
+          // console.log(maxdepth2)
+          for (var i= 0; i < total_depth + 1 ; i++ )
+          {
+            drawcircle("black", maxdepth2[0][1], maxdepth2[0][2] + (calc * i), 0, i)
+          }
+          
+          drawline(maxdepth2[0][1], maxdepth2[0][2], maxdepth2[1][1], maxdepth2[1][2])
+          
+        }
+      }     
+    }
+  }
+
+  //find the pipelevel, groundlevel and pipe length
+  if (pointbtn.checked == true)
+  {
+    lastx = coordX.length - 1
+    lasty = coordY.length - 1
+
+    // this condition will run if user click on edit button
+    if (edit_row >= 0)
+    {
+      if (markclone1 == markclone2)
+      {
+        
+        let bar = confirm('Confirm or deny');
+        if (bar == true)
+        {
+          markclone1 =markclone1+1
+          pipecoord[edit_row] = [coordX[lastx], coordY[lasty]]
+          drawcircle("yellow", coordX[lastx], coordY[lasty], edit_row+1)
+          // console.log('pipelevel',pipelevel)
+
+          //draw line from previous point to current point 
+          if(edit_row > 1)
+          {
+            drawline(pipecoord[edit_row-1][0], pipecoord[edit_row-1][1], pipecoord[edit_row][0], pipecoord[edit_row][1])
+          }
+
+          else if (edit_row < pipecoord.length)
+          {
+            drawline(pipecoord[edit_row][0], pipecoord[edit_row][1], pipecoord[edit_row+1][0], pipecoord[edit_row+1][1])
+          }
+
+          //draw horizontal line
+          drawline(pipecoord[edit_row][0], 0, pipecoord[edit_row][0], canvasElem.height )
+        }
+
+        if (save_values.length > 0)
+        {
+          if((pipecoord[edit_row][0] > save_length[save_length.length-1][0]) && (pipecoord[edit_row][0] < save_length[save_length.length-1][1]))
+          {
+            if(markclone1!= markclone2)
+            {
+              drawcircle("green",pipecoord[edit_row][0],pipecoord[edit_row][1], 0.5)
+              len = save_values.length - 1
+              pipelength = calc_length_edit(save_length[len][0], save_length[len][1], 
+                save_values[len][0],save_values[len][1])
+              // alert('pipe length value for current point is '+ pipelength.toFixed(2))
+              shortcut = 1
+            }
+          }        
+        }
+      }
+
+      else
+      {
+        let bar = confirm('Confirm or deny');
+        if (bar == true)
+        {
+          //check wheter the ground point is true or not
+          if (coordX[lastx] > pipecoord[edit_row][0] + 3 || coordX[lastx] < pipecoord[edit_row][0] - 3)
+          {
+            alert("Please pinpoint ground level first")
+          }
+
+          else
+          {
+            markclone2 =markclone2+1
+            groundlevel=[]
+            combine=[]
+            groundcoord[edit_row] = [coordX[lastx], coordY[lasty]]
+            drawcircle("blue", coordX[lastx], coordY[lasty], edit_row+1)
+            drawcircle("yellow",pipecoord[edit_row][0],pipecoord[edit_row][1], 0.5)
+            groundlevel.push(level(coordY[lasty]))
+            if (pipelength == 0 && shortcut == 0)
+            {
+              pipelength = prompt("Insert pipe length value")
+            }
+
+            else
+            {
+              len = save_values.length - 1
+              pipelength = calc_length_edit(save_length[len][0], save_length[len][1], 
+                save_values[len][0],save_values[len][1])
+              shortcut = 0
+            }
+            pipelevel.push(level(pipecoord[edit_row][1]))
+            //console.log('pipelevel',pipelevel)
+            var combine =pipelevel.concat(groundlevel)
+            data[edit_row] = [combine[0],combine[1], Number(pipelength)]
+            // console.log('data:',data)
+
+            //draw line for each point
+            if(edit_row > 1)
+            {
+              drawline(groundcoord[edit_row-1][0], groundcoord[edit_row-1][1], groundcoord[edit_row][0], groundcoord[edit_row][1])
+            }
+
+            //create table and insert data
+            const tableBody = document.getElementById("myTableBody");
+            table_data = data
+
+            // Start removing from the last row to the first one
+            while(tableBody.firstChild)
+            {
+              tableBody.removeChild(tableBody.firstChild);
+            }
+            for (let i = 0; i < table_data.length; i++) 
+            {
+              const row = tableBody.insertRow();
+              const cell1 = row.insertCell(0);
+              cell1.innerHTML = i+1;
+              
+              for (let j = 0; j < table_data[i].length; j++) {
+                const cell2 = row.insertCell(j+1);
+                num = Math.round(table_data[i][j] * 100) / 100
+                cell2.innerHTML = num.toFixed(2);
+              }
+            }
+            pipelength = 0, pipelevel=[], edit_row = -1
+          }
+        }
+      }
+
+    }
+
+    else
+    {
+      if (mark1 == mark2)
+      {
+        let bar = confirm('Confirm or deny');
+        if (bar == true)
+        {
+          mark1 =mark1+1
+          pipecoord.push([coordX[lastx], coordY[lasty]])
+          drawcircle("yellow", coordX[lastx], coordY[lasty], mark1)
+          // console.log('pipelevel',pipelevel)
+
+          //draw line from previous point to current point 
+          if(pipecoord.length > 1)
+          {
+            drawline(pipecoord[mark1-2][0], pipecoord[mark1-2][1], pipecoord[mark1-1][0], pipecoord[mark1-1][1])
+          }
+
+          //draw horizontal line
+          drawline(pipecoord[mark1-1][0], 0, pipecoord[mark1-1][0], canvasElem.height )
+        }
+
+        if (save_values.length > 0)
+        {
+          if((pipecoord[pipecoord.length-1][0] > save_length[save_length.length-1][0]) && (pipecoord[pipecoord.length-1][0] < save_length[save_length.length-1][1]))
+          {
+            if(mark1!= mark2)
+            {
+              drawcircle("green",pipecoord[pipecoord.length-1][0],pipecoord[pipecoord.length-1][1], 0.5)
+              len = save_values.length - 1
+              pipelength = calc_length(save_length[len][0], save_length[len][1], 
+                save_values[len][0],save_values[len][1])
+              // alert('pipe length value for current point is '+ pipelength.toFixed(2))
+              shortcut = 1
+            }
+            //this variable is used in calculate length
+            
+          }        
+        }
+      }
+
+      else
+      {
+        let bar = confirm('Confirm or deny');
+        if (bar == true)
+        {
+          //check wheter the ground point is true or not
+          if (coordX[lastx] > pipecoord[mark1-1][0] + 3 || coordX[lastx] < pipecoord[mark1-1][0] - 3)
+          {
+            alert("Please pinpoint ground level first")
+          }
+
+          else
+          {
+            mark2 =mark2+1
+            groundlevel=[]
+            combine=[]
+            groundcoord.push([coordX[lastx], coordY[lasty]])
+            drawcircle("blue", coordX[lastx], coordY[lasty], mark2)
+            drawcircle("yellow",pipecoord[pipecoord.length-1][0],pipecoord[pipecoord.length-1][1], 0.5)
+            groundlevel.push(level(coordY[lasty]))
+            if (pipelength == 0 && shortcut == 0)
+            {
+              pipelength = prompt("Insert pipe length value")
+            }
+
+            else
+            {
+              len = save_values.length - 1
+              pipelength = calc_length(save_length[len][0], save_length[len][1], 
+                save_values[len][0],save_values[len][1])
+              shortcut = 0
+            }
+            pipelevel.push(level(pipecoord[mark1 - 1][1]))
+            //console.log('pipelevel',pipelevel)
+            var combine =pipelevel.concat(groundlevel)
+            data.push([combine[0],combine[1], Number(pipelength)])
+            // console.log('data:',data)
+
+            //draw line for each point
+            if(groundcoord.length > 1)
+            {
+              drawline(groundcoord[mark1-2][0], groundcoord[mark1-2][1], groundcoord[mark1-1][0], groundcoord[mark1-1][1])
+            }
+
+            //create table and insert data
+            const tableBody = document.getElementById("myTableBody");
+            table_data = data
+
+            // Start removing from the last row to the first one
+            while(tableBody.firstChild)
+            {
+              tableBody.removeChild(tableBody.firstChild);
+            }
+            for (let i = 0; i < table_data.length; i++) 
+            {
+              const row = tableBody.insertRow();
+              const cell1 = row.insertCell(0);
+              cell1.innerHTML = i+1;
+              
+              for (let j = 0; j < table_data[i].length; j++) {
+                const cell2 = row.insertCell(j+1);
+                num = Math.round(table_data[i][j] * 100) / 100
+                cell2.innerHTML = num.toFixed(2);
+              }
+            }
+            pipelength = 0, pipelevel=[]
+          }
+        }
+      }
+    }
+  }
+
+  //find length based on last point
+  if (lengthbtn.checked == true)
+  {
+    getcoord = coordX.length -1
+    //calculate pipe length value automatically
+    if (coordY[getcoord] > 0)
+    {
+      let bar = confirm('Confirm or deny');
+      if (bar == true)
+      {
+        if (arr_valueFirst.length == 0)
+        {
+          
+          arr_valueFirst.push(coordX[getcoord], coordY[getcoord]);
+          valueFirst = Number(prompt("1st pipelength value"));
+        }
+
+        else
+        {
+          arr_valueSecond.push(coordX[getcoord], arr_valueFirst[1]);
+          while(valueSecond == 0)
+          {
+            valueSecond = Number(prompt("2nd pipelength value"));
+            if (valueSecond == 0)
+            {
+              alert("Please insert pipelength value")
+            }
+          }
+          if(pipecoord.length > 0)
+          {
+            pipelength = calc_length(arr_valueFirst[0], arr_valueSecond[0], valueFirst, valueSecond);
+          }
+          //store x coordinate for length and its value
+          save_length.push([arr_valueFirst[0], arr_valueSecond[0]])
+          save_values.push([valueFirst, valueSecond])
+          arr_valueFirst = [], arr_valueSecond=[], valueSecond = 0
+          lengthbtn.checked= false, pointbtn.checked=true
+        }                               
+      }
+    }  
+  }            
+});
+
 //generate report
-let saveFile =()=>{var e=[],t=[],n=[];
-//convert array to \t
-for(var l=0;l<v.length;l++){t=[];for(var a=0;a<v[l].length;a++){num=Math.round(v[l][a]*100)/100;if(a==0){t.push('\n'+num.toFixed(2))}else if(a==1){t.push(num.toFixed(2))}else if(l==v.length-1&&a==v[l].length-1){t.push(num.toFixed(2)+':,')}else{t.push(num.toFixed(2)+':')}}n.push(t)}
-//convert to 1d array
-for(var l=0;l<v.length;l++){e=e.concat(n[l])}
-// console.log('newArr',newArr)
-var r=e.toString().replaceAll(",","\t");var r=r.toString().replaceAll(":\t","");
-// console.log('savedata1:\n',savedata1)
-let o='p_level\t'+'g_level\t'+'length';const i=new Blob([o,r],{type:'text/plain'});const f=prompt("Insert file name?");alert(v.length+" points have been exported");let u=document.createElement("a");u.download=f;if(window.webkitURL!=null){u.href=window.webkitURL.createObjectURL(i)}else{u.href=window.URL.createObjectURL(i);u.style.display="none";document.body.appendChild(u)}u.click()};z();
+let saveFile = () => 
+{
+  var newArr=[], new_arr1=[], new_arr2=[]
+  //convert array to \t
+  for ( var i = 0; i < data.length; i++)
+  {
+    new_arr1=[]
+    for(var j = 0; j < data[i].length; j++)
+    {
+      num = (Math.round(data[i][j] * 100) / 100)
+      if (j == 0)
+      {
+        new_arr1.push('\n' + num.toFixed(2))
+      }
+      else if (j == 1)
+      {
+        new_arr1.push(num.toFixed(2))
+      }
+
+      else if ((i == data.length -1) && (j == data[i].length-1 ))
+      {
+        new_arr1.push(num.toFixed(2) + ':,')
+      }
+
+      else
+      {
+        new_arr1.push(num.toFixed(2) + ':')
+      }
+    }
+    new_arr2.push(new_arr1)
+  }
+  //convert to 1d array
+  for(var i = 0; i < data.length; i++)
+  {
+      newArr = newArr.concat(new_arr2[i]);
+  }
+  // console.log('newArr',newArr)
+  var savedata1 = newArr.toString().replaceAll(",", "\t")
+  var savedata1 = savedata1.toString().replaceAll(":\t", "")
+  // console.log('savedata1:\n',savedata1)
+  let savedata2 ='p_level\t' + 'g_level\t' + 'length';
+  const textToBLOB = new Blob([savedata2,savedata1], {type: 'text/plain'});
+  const sFileName = prompt("Insert file name?")
+  alert(data.length + " points have been exported")
+
+  let newLink = document.createElement("a");
+  newLink.download = sFileName;
+
+  if (window.webkitURL != null) 
+  {
+    newLink.href = window.webkitURL.createObjectURL(textToBLOB);
+  }
+  else 
+  {
+    newLink.href = window.URL.createObjectURL(textToBLOB);
+    newLink.style.display = "none";
+    document.body.appendChild(newLink);
+  }
+
+  newLink.click(); 
+}
+
+Load_Image()

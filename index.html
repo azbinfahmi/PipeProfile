@@ -9,12 +9,15 @@
 </head>
 <body>
     <div class="sticky">
+        <button id="open" onclick="changeImage()" style = "cursor: pointer;">
+            <img id="myImage" src="img/left.png" alt="Image 1">
+        </button>
         <ol id="navbar">
-            <button style = "cursor: pointer;"class="tick" id="undo"> Undo</button>
+            <button style = "cursor: pointer;" id="undo"> Undo</button>
             <li class="tick"> <input type="checkbox" id="Points"> Points</li>
             <li class="tick"> <input type="checkbox" id="length"> Calculate length</li>
-            <li> <input type="checkbox" id="H_helper"> Vertical Line Assist</li>
-            <li> <input type="checkbox" id="L_helper"> Line to point Assist</li> 
+            <li class="tick"> <input type="checkbox" id="H_helper"> Vertical Line Assist</li>
+            <li class="tick"> <input type="checkbox" id="L_helper"> Line to point Assist</li> 
         </ol>
     </div>
 
@@ -45,14 +48,19 @@
                         </tbody>
                     </table>
                 </div>
+            
+                <ul style="display: flex; border: 0; padding: 10px; list-style: none;">
+                    <li style="padding-right: 10px;"> <button style = "cursor: pointer;" id="edit"> Edit</button> </li>
+                    <li> <button style = "cursor: pointer;" id="delete"> Delete</button></li>
+                </ul>
                 <li style="padding: 20px;"><button class="animated-button" id="bt" onclick="saveFile()"> Generate Report</button></li>
                 <footer>
-                    <p>&copy; 2023 Pipe Profile Calculator (Beta v1.5)</p>
+                    <p>&copy; 2023 Pipe Profile Calculator (Beta v1.6)</p>
                     <p> Developed by AzbinFahmi</p>
                 </footer>
             </ul>
         </div>
-        <h1 style="margin: 40px;"></h1>
+        <h1 style="margin: 10px;"></h1>
         <canvas class ="main", width="1000", height="700", id="myCanvas"></canvas>
     </div>
 
@@ -60,5 +68,6 @@
     
 
     <script src="data.js"></script>
+    <script src="button.js"></script>
 </body>
 </html>
