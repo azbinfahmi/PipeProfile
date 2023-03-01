@@ -26,24 +26,61 @@ function Load_Image()
   imgInput.addEventListener('change', function(e) {
   if(e.target.files) 
   {
-    Scale = Number(prompt("Add a scale to the image","1"))
-    if (Scale == 0)
+    const file = imgInput.files[0]
+    const reader = new FileReader();
+    const { PDFDocument } = PDFLib;
+    if(file.type == 'application/pdf')
     {
-      scale = 1
+      reader.onload = function() {
+				const typedarray = new Uint8Array(this.result);
+				const pdfDoc = PDFDocument.load(typedarray);
+
+				pdfDoc.promise.then(function(pdf) {
+					pdf.getPage(1).then(function(page) {
+						const scale = 1.5;
+						const viewport = page.getViewport({scale: scale});
+						const canvasContext = canvas.getContext('2d');
+
+						canvas.width = viewport.width;
+						canvas.height = viewport.height;
+
+						const renderContext = {
+							canvasContext: canvasContext,
+							viewport: viewport
+						};
+
+						page.render(renderContext).promise.then(function() {
+							const image = new Image();
+							image.src = canvas.toDataURL('image/png');
+							document.body.appendChild(image);
+						});
+					});
+				});
+      }
+      reader.readAsArrayBuffer(file);
+      console.log("azim46")
     }
-    let imageFile = e.target.files[0]; //here we get the image file
-    var reader = new FileReader();
-    reader.readAsDataURL(imageFile);
-    reader.onloadend = function (e) 
+
+    else
     {
-      myImage = new Image(); // Creates image object
-      myImage.src = e.target.result; // Assigns converted image to image object
-      myImage.onload = function() {
-        var myCanvas = document.getElementById("myCanvas"); // Creates a canvas object
-        var myContext = myCanvas.getContext("2d"); // Creates a contect object
-        myCanvas.width = myImage.width*Scale ; // Assigns image's width to canvas
-        myCanvas.height = myImage.height*Scale; // Assigns image's height to canvas
-        myContext.drawImage(myImage,0,0, myImage.width *Scale, myImage.height *Scale); // Draws the image on canvas
+      Scale = Number(prompt("Add a scale to the image","1"))
+      if (Scale == 0)
+      {
+        scale = 1
+      }
+      let imageFile = e.target.files[0]; //here we get the image file
+      reader.readAsDataURL(imageFile);
+      reader.onloadend = function (e) 
+      {
+        myImage = new Image(); // Creates image object
+        myImage.src = e.target.result; // Assigns converted image to image object
+        myImage.onload = function() {
+          var myCanvas = document.getElementById("myCanvas"); // Creates a canvas object
+          var myContext = myCanvas.getContext("2d"); // Creates a contect object
+          myCanvas.width = myImage.width*Scale ; // Assigns image's width to canvas
+          myCanvas.height = myImage.height*Scale; // Assigns image's height to canvas
+          myContext.drawImage(myImage,0,0, myImage.width *Scale, myImage.height *Scale); // Draws the image on canvas
+        }
       }
     }
   }
@@ -873,6 +910,7 @@ canvasElem.addEventListener("mousedown", function(e)
         let bar = confirm('Confirm or deny');
         if (bar == true)
         {
+          shortcut = 0
           mark1 =mark1+1
           pipecoord.push([coordX[lastx], coordY[lasty]])
           drawcircle("yellow", coordX[lastx], coordY[lasty], mark1)
@@ -906,7 +944,7 @@ canvasElem.addEventListener("mousedown", function(e)
           }        
         }
       }
-
+      
       else
       {
         let bar = confirm('Confirm or deny');
@@ -927,6 +965,7 @@ canvasElem.addEventListener("mousedown", function(e)
             drawcircle("blue", coordX[lastx], coordY[lasty], mark2)
             drawcircle("yellow",pipecoord[pipecoord.length-1][0],pipecoord[pipecoord.length-1][1], 0.5)
             groundlevel.push(level(coordY[lasty]))
+            
             if (pipelength == 0 && shortcut == 0)
             {
               pipelength = prompt("Insert pipe length value")
