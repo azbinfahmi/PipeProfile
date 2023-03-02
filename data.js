@@ -28,41 +28,7 @@ function Load_Image()
   {
     const file = imgInput.files[0]
     const reader = new FileReader();
-    const { PDFDocument } = PDFLib;
-    if(file.type == 'application/pdf')
-    {
-      reader.onload = function() {
-				const typedarray = new Uint8Array(this.result);
-				const pdfDoc = PDFDocument.load(typedarray);
-
-				pdfDoc.promise.then(function(pdf) {
-					pdf.getPage(1).then(function(page) {
-						const scale = 1.5;
-						const viewport = page.getViewport({scale: scale});
-						const canvasContext = canvas.getContext('2d');
-
-						canvas.width = viewport.width;
-						canvas.height = viewport.height;
-
-						const renderContext = {
-							canvasContext: canvasContext,
-							viewport: viewport
-						};
-
-						page.render(renderContext).promise.then(function() {
-							const image = new Image();
-							image.src = canvas.toDataURL('image/png');
-							document.body.appendChild(image);
-						});
-					});
-				});
-      }
-      reader.readAsArrayBuffer(file);
-      console.log("azim46")
-    }
-
-    else
-    {
+    
       Scale = Number(prompt("Add a scale to the image","1"))
       if (Scale == 0)
       {
@@ -83,9 +49,10 @@ function Load_Image()
         }
       }
     }
-  }
-});
+  });
 }
+
+
 
 //get coordinate when click
 function printMousePos(canvas, event) {
