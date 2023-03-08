@@ -31,7 +31,7 @@
         <div class="profile">
             <ul>
                 <h1>Pipe Profile Calculator</h1>
-                <li class="list"> <input type="file"  accept="image/jpeg, image/png" name="image" id="imageInput"></li>
+                <li class="list"> <input type="file"  accept= "image/jpeg, image/png, application/pdf" name="image" id="imageInput"></li>
                 <li class="list"> <input type="checkbox" id="checkX"> Depth point of the graph</li>
                 <div style="overflow-y: scroll; height: 200px;">
                     <table id="myTable">
@@ -51,9 +51,15 @@
             
                 <ul style="display: flex; border: 0; padding: 10px; list-style: none;">
                     <li style="padding-right: 10px;"> <button style = "cursor: pointer;" id="edit"> Edit</button> </li>
+                    <li style="padding-right: 10px;"> <button style = "cursor: pointer;" id="add"> Add</button></li>
                     <li> <button style = "cursor: pointer;" id="delete"> Delete</button></li>
                 </ul>
-                <li style="padding: 20px;"><button class="animated-button" id="bt" onclick="saveFile()"> Generate Report</button></li>
+                <ol style="display: block; list-style: none; padding: 3%;">
+                    <li><button class="animated-button" id="bt" onclick="saveFile()"> Generate Report</button></li>
+                    <br>
+                    <li> <a href="PPV/viewer.html" target="_blank"> PipeProfile Viewer</a></li>
+                </ol>
+                
                 <footer>
                     <p>&copy; 2023 Pipe Profile Calculator (Beta v1.6)</p>
                     <p> Developed by AzbinFahmi</p>
@@ -61,13 +67,11 @@
             </ul>
         </div>
         <h1 style="margin: 10px;"></h1>
-        <canvas class ="main", width="1000", height="700", id="myCanvas"></canvas>
+        <canvas class ="main canvas-container", width="1000", height="700", id="myCanvas"></canvas>
     </div>
-
-    
-    
 
     <script src="data.js"></script>
     <script src="button.js"></script>
+
 </body>
 </html>

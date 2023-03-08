@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style2.css">
+    <title>Viewer</title>
+</head>
+<body>
+    <div class="sticky">
+        <button id="open" onclick="changeImage()" style = "cursor: pointer;">
+            <img id="myImage" src="img/left.png" alt="Image 1">
+        </button>
+        <ol id="navbar" style="list-style: none">
+            <li class="tick"> <input type="checkbox" id="off_p"> points</li>
+            <li class="tick"> <input type="checkbox" id="off_l"> label</li>
+
+        </ol>
+    </div>
+
+    <canvas class ="main canvas-container", width="1000", height="700", id="myCanvas"></canvas>
+    <script src="viewer.js"></script>
+    <script src="button.js"></script>
+
+</body>
+</html>
