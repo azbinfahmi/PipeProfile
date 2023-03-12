@@ -1,16 +1,16 @@
 // Retrieve the array from local storage
-const pipecoord = JSON.parse(localStorage.getItem("pipecoord"));
-const groundcoord = JSON.parse(localStorage.getItem("groundcoord"));
-const trans_pipelength = JSON.parse(localStorage.getItem("trans_pipelength")).map(Number);
-const c_width = JSON.parse(localStorage.getItem("c_width"));
-const c_height = JSON.parse(localStorage.getItem("c_height"));
+var pipecoord = JSON.parse(localStorage.getItem("pipecoord"));
+var groundcoord = JSON.parse(localStorage.getItem("groundcoord"));
+var trans_pipelength = JSON.parse(localStorage.getItem("trans_pipelength")).map(Number);
+var c_width = JSON.parse(localStorage.getItem("c_width"));
+var c_height = JSON.parse(localStorage.getItem("c_height"));
 const canvasElem = document.getElementById("myCanvas");
 const ctx = canvasElem.getContext('2d');
 const off_pbtn = document.querySelector("#off_p");
 const off_lbtn = document.querySelector("#off_l");
 
-off_pbtn.checked = true
-off_lbtn.checked = true
+off_pbtn.checked = false
+off_lbtn.checked = false
 //setup canvas width and height based on last image
 var myCanvas = document.getElementById("myCanvas");
 if(c_width > 0)
@@ -18,13 +18,11 @@ if(c_width > 0)
     myCanvas.width =  Number(c_width);
     myCanvas.height = Number(c_height);
 }
-
 else
 {
     myCanvas.width =  1000;
     myCanvas.height = 700;
 }
-
 
 function drawcircle(color, a, b, no)
 {
@@ -88,6 +86,11 @@ function drawline(x1,y1,x2,y2, color)
 
 function redraw()
 {
+  var pipecoord = JSON.parse(localStorage.getItem("pipecoord"));
+  var groundcoord = JSON.parse(localStorage.getItem("groundcoord"));
+  var trans_pipelength = JSON.parse(localStorage.getItem("trans_pipelength")).map(Number);
+  var c_width = JSON.parse(localStorage.getItem("c_width"));
+  var c_height = JSON.parse(localStorage.getItem("c_height"));
     //draw pipe depth
     for ( var i = 0; i < pipecoord.length; i++)
     {   
@@ -124,12 +127,13 @@ redraw()
 
 
 
-// canvasElem.addEventListener('mousemove', function(event) {
+canvasElem.addEventListener('mousemove', function(event) {
 
-//     const x = event.offsetX;
-//     ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
-//     redraw()
-// })
+    const x = event.offsetX;
+    ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
+    console.log('pipecoord',pipecoord)
+    redraw()
+})
 
 // canvasElem.addEventListener("mousedown", function(event) {
 //     const x = event.offsetX;

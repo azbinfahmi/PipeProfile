@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style2.css">
-    <title>Live Viewer</title>
+    <title>Viewer</title>
 </head>
 <body>
     <div class="sticky">
@@ -13,8 +13,24 @@
             <img id="myImage" src="img/left.png" alt="Image 1">
         </button>
         <ol id="navbar" style="list-style: none">
+            <li> <input type="file" accept=".txt, .doc, .docx" name="textFile" id="textInput"></li>
             <li class="tick"> <input type="checkbox" id="off_p"> points</li>
             <li class="tick"> <input type="checkbox" id="off_l"> label</li>
+            <div style="overflow-y: scroll; height: 200px;">
+                <table id="myTable">
+                    <thead>
+                        <tr>
+                            <th>point_no</th>
+                            <th>p_depth</th>
+                            <th>g_depth</th>
+                            <th>length</th>
+                        </tr>
+                    </thead>
+                    <tbody id="myTableBody">
+
+                    </tbody>
+                </table>
+            </div>
 
         </ol>
     </div>

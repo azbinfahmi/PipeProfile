@@ -6,7 +6,7 @@ var total_depth, total_pixel,calc, trans_pipecoord =[], trans_groundcoord =[], t
 var arr_valueFirst =[], arr_valueSecond =[], valueFirst=0, valueSecond=0, checking = 0
 var pipelength = 0, mark1 = 0, mark2 = 0, markclone1 =0, markclone2 = 0,  shortcut = 0;
 var myImage, Scale
-var edit_row = -1, del = -1,c_width=0, c_height =0
+var edit_row = -1, del = -1,c_width=0, c_height =0, edit_what = 0
 const undobtn = document.querySelector("#undo");
 const lengthbtn = document.querySelector("#length");
 const depthbtn = document.querySelector("#checkX");
@@ -20,6 +20,8 @@ const addbtn = document.querySelector("#add")
 
 const canvasElem = document.getElementById("myCanvas");
 const ctx = canvasElem.getContext('2d');
+
+depthbtn.checked = true;
 //Load and display the image into canvas
 function Load_Image()
 {
@@ -302,6 +304,17 @@ function level(y)
   return total
 }
 
+//used in edit point in table
+function reverse_level(x,actual)
+{
+  total_depth = maxdepth2[0][0] - maxdepth2[1][0]
+  total_pixel = maxdepth2[1][2] - maxdepth2[0][2]
+  calc = total_pixel / total_depth
+  value_y_coord = (maxdepth2[0][0]*calc) + maxdepth2[0][2] - (actual * calc)
+  
+  return newvalue =[x,value_y_coord]
+}
+
 //undo button for depth point
 function depth_undo()
 {
@@ -462,6 +475,8 @@ function redraw()
     }
   }
 
+  transf()
+
   //draw pipe depth
   for ( var i = 0; i < pipecoord.length; i++)
   {
@@ -518,6 +533,26 @@ function redraw()
     drawcircle("purple",arr_valueSecond[0],arr_valueSecond[1], 0.5)
 
     drawline(arr_valueFirst[0],arr_valueFirst[1],arr_valueSecond[0],arr_valueSecond[1])
+  }
+
+  // Start removing from the last row to the first one
+  const tableBody = document.getElementById("myTableBody");
+  table_data = data
+  while(tableBody.firstChild)
+  {
+    tableBody.removeChild(tableBody.firstChild);
+  }
+  for (let i = 0; i < table_data.length; i++) 
+  {
+    const row = tableBody.insertRow();
+    const cell1 = row.insertCell(0);
+    cell1.innerHTML = i+1;
+    
+    for (let j = 0; j < table_data[i].length; j++) {
+      const cell2 = row.insertCell(j+1);
+      num = Math.round(table_data[i][j] * 100) / 100
+      cell2.innerHTML = num.toFixed(2);
+    }
   }
 }
 
@@ -578,7 +613,6 @@ pointbtn.addEventListener('change',function(){
       depthbtn.checked = true
     }
   }
-  
 })
 
 //turn off point button when length button is clicked
@@ -595,7 +629,6 @@ lengthbtn.addEventListener('change',function(){
     {
       pointbtn.checked = false
     }
-    
   }
 })
 
@@ -645,11 +678,49 @@ editbtn.addEventListener("click", function(){
 
   else
   {
-    pipecoord[edit_row] = []
-    groundcoord[edit_row] =[]
-    data[edit_row] = []
-    ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
-    redraw()
+
+    edit_what = 0
+    while( edit_what == 0)
+    {
+      edit_what = Number(prompt("Enter 1 for edit point's value by insert new value or Enter 2 for edit point's value by adjusting points in canvas", 1))
+
+      if(edit_what != 1 && edit_what != 2)
+      {
+        alert("Please enter 1 or 2")
+        edit_what = 0
+      }
+    }
+
+    //edit table by insert value
+    if(edit_what == 1)
+    {
+      new_pipe = Number(prompt("Pipe depth value", data[edit_row][0].toFixed(2)))
+      new_ground = Number(prompt("Ground depth value", data[edit_row][1].toFixed(2) ))
+      new_length = data[edit_row][2]
+
+      data[edit_row] = [new_pipe, new_ground, new_length]
+
+      new_pipecoord = reverse_level(pipecoord[edit_row][0], new_pipe+ 0.000001)
+      new_groundcoord = reverse_level(groundcoord[edit_row][0], new_ground+ 0.000001)
+
+      pipecoord[edit_row] = new_pipecoord
+      groundcoord[edit_row] =new_groundcoord
+
+      edit_row = -1
+      ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
+      redraw()
+    }
+
+    else if (edit_what ==2)
+    {
+      pipecoord[edit_row] = []
+      groundcoord[edit_row] =[]
+      data[edit_row] = []
+      ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
+      redraw()
+    }
+    
+   
   }
 
 })
@@ -847,8 +918,7 @@ canvasElem.addEventListener("mousedown", function(e)
             drawcircle("black", maxdepth2[0][1], maxdepth2[0][2] + (calc * i), 0, i)
           }
           
-          drawline(maxdepth2[0][1], maxdepth2[0][2], maxdepth2[1][1], maxdepth2[1][2])
-          
+          drawline(maxdepth2[0][1], maxdepth2[0][2], maxdepth2[1][1], maxdepth2[1][2])         
         }
       }     
     }
