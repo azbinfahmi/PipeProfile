@@ -22,6 +22,8 @@ const canvasElem = document.getElementById("myCanvas");
 const ctx = canvasElem.getContext('2d');
 
 depthbtn.checked = true;
+
+
 //Load and display the image into canvas
 function Load_Image()
 {
