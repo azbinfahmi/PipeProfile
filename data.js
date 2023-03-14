@@ -7,6 +7,8 @@ var arr_valueFirst =[], arr_valueSecond =[], valueFirst=0, valueSecond=0, checki
 var pipelength = 0, mark1 = 0, mark2 = 0, markclone1 =0, markclone2 = 0,  shortcut = 0;
 var myImage, Scale
 var edit_row = -1, del = -1,c_width=0, c_height =0, edit_what = 0
+var zoomLevel = 1
+
 const undobtn = document.querySelector("#undo");
 const lengthbtn = document.querySelector("#length");
 const depthbtn = document.querySelector("#checkX");
@@ -22,6 +24,8 @@ const canvasElem = document.getElementById("myCanvas");
 const ctx = canvasElem.getContext('2d');
 
 depthbtn.checked = true;
+HHbtn.checked = true;
+LHbtn.checked = true;
 
 
 //Load and display the image into canvas

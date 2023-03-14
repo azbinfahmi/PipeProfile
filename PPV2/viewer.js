@@ -4,9 +4,9 @@ const ctx = canvasElem.getContext('2d');
 const off_pbtn = document.querySelector("#off_p");
 const off_lbtn = document.querySelector("#off_l");
 const textFileInput  = document.getElementById('textInput');
-var ground = [],pipe = [], chainage =[], data =[];
+var ground = [],pipe = [], chainage =[], newI=[], data =[];
 
-var pipe_pixel =[], ground_pixel=[], d = 0
+var pipe_pixel =[], ground_pixel=[], d = 0, asb = 0
 off_pbtn.checked = false
 off_lbtn.checked = false
 
@@ -32,7 +32,8 @@ function drawTable()
   //insert table data
   const tableBody = document.getElementById("myTableBody");
   table_data = data
-
+  //to find where the new asbuilt has been inserted
+  var r =0 , k =0
   // Start removing from the last row to the first one
   while(tableBody.firstChild)
   {
@@ -40,18 +41,35 @@ function drawTable()
   }
   for (let i = 0; i < table_data.length; i++) 
   {
+    r = r+1
     const row = tableBody.insertRow();
     const cell1 = row.insertCell(0);
-    cell1.innerHTML = i+1;
-    
-    for (let j = 0; j < table_data[i].length; j++) {
-      const cell2 = row.insertCell(j+1);
-      num = Math.round(table_data[i][j] * 100) / 100
-      cell2.innerHTML = num.toFixed(2);
+    if ( i == newI[k])
+    {
+      r = 0
+      k = k + 1
     }
+
+    if ( r != 0)
+    {
+      cell1.innerHTML = r;
+      for (let j = 0; j < table_data[i].length; j++) {
+        const cell2 = row.insertCell(j+1);
+        num = Math.round(table_data[i][j] * 100) / 100
+        cell2.innerHTML = num.toFixed(2);
+      }
+    }
+
+    else if (r == 0)
+    {
+      drw = k + 1
+      cell1.innerHTML = "Drawing "+ drw;
+    }
+    
   }
 }
-function drawcircle(color, a, b, no)
+
+function drawcircle(color, a, b, no , i)
 {
   //draw circle
   var c = document.getElementById("myCanvas")
@@ -85,6 +103,15 @@ function drawcircle(color, a, b, no)
         }
     }
   }
+
+  if( no == 0.1)
+  {
+    ctx.fillStyle = "black";
+    ctx.font = "11px Arial";
+    ctx.textAlign = "center";
+    var name = i
+    ctx.fillText(name, a - 15, b );
+  }
 }
 
 function drawline(x1,y1,x2,y2, color)
@@ -111,42 +138,78 @@ function drawline(x1,y1,x2,y2, color)
   }
 }
 
+//draw vertical line
+function drawLine(x, ch) {
+  // Draw the line
+  ctx.beginPath();
+  ctx.moveTo(x, 0);
+  ctx.lineTo(x, canvasElem.height);
+  ctx.strokeStyle = "black";
+  ctx.lineWidth = 1;
+  ctx.fillStyle = "black"; // Set the fill color of the label
+  ctx.font = "15px Arial"; // Set the font size and style of the label
+  ctx.fillText("CH"+ch, x, 100); // Draw the label at the desired position
+  ctx.stroke();
+}
+
+//find maximumm number of depth point
+function higher(a,b)
+{
+  max1 = Math.max(...a.filter(value => !isNaN(value)))
+  max2 = Math.max(...b.filter(value => !isNaN(value)))
+
+  if (max1 > max2)
+  {
+    return max1
+  }
+
+  else
+  {
+    return max2
+  }
+}
+
+//draw vertical line for each 300m of chainage
+function draw_vertical()
+{
+  var m = 0
+  for ( var i =0; i < pipe.length; i++)
+  {
+    if(isNaN(pipe[i]) == true)
+    {
+      asb = Math.floor(chainage[i - 1]) 
+      drawLine(pipe_pixel[i - 1 - m][0], asb )
+      m = m + 1
+      
+    }
+  } 
+}
+
 function redraw()
 {
 
-  max_chainage = Math.max(...chainage) - Math.min(...chainage)
-  max_height = Math.max(...ground)
-  
-  if((max_chainage *4) + 100 > myCanvas.width)
-  {
-      myCanvas.width = (max_chainage * 5 ) + 900
-      myCanvas.height = (max_height + 500) * 2
-  }
+  var max_chainage = Math.max(...chainage.filter(value => !isNaN(value))) - Math.min(...chainage.filter(value => !isNaN(value)))
+  max_height = higher(pipe, ground)
+  value_ycoord = 35
+  var Y = 35
+  maxcanvas_height = (max_height * value_ycoord) + Y
+
+  myCanvas.width = (max_chainage * 5 ) + 200
+  myCanvas.height = (maxcanvas_height + 100)
   reverse_level()
+  draw_vertical()
 }
 
 function reverse_level()
 {
-  //   total_depth = maxdepth2[0][0] - maxdepth2[1][0]
-  // total_pixel = maxdepth2[1][2] - maxdepth2[0][2]
-  // calc = total_pixel / total_depth
-  // value_y_coord = (maxdepth2[0][0]*calc) + maxdepth2[0][2] - (actual * calc)
-
-  //depth point = 1m = 35pix
-  //chainage 25m = 275pix, jadi 1m = 100/25 = 4 (so, 1m ch = 4pix)
-  // klaua starting chainage bukan dari 0, semua number dalam length kena tolak number paling min dalam array length
-
-  //cari min number untuk chainage
-  min_chainage = Math.min(...chainage)
+  min_chainage = Math.min(...chainage.filter(value => !isNaN(value)))
   for(var i = 0; i< chainage.length; i++)
   {
     chainage[i] = Number((chainage[i] - min_chainage).toFixed(2))
   }
-  max_chainage = Math.max(...chainage)
   pipe_pixel= pixel(pipe, chainage)
   ground_pixel= pixel(ground, chainage)
 
-  // ground_pixel= pixel(ground, chainage)
   // console.log('chainage after',chainage)
   // console.log('pipe_pixel',pipe_pixel)
   // console.log('ground_pixel',ground_pixel)
@@ -160,14 +223,30 @@ function reverse_level()
   value_ycoord = 35
   var X = 115
   var Y = 35
+  min_height = Math.min(...pipe.filter(value => !isNaN(value)))
+  if (min_height > 0)
+  {
+    min_height = 0
+  }
+
+  else
+  {
+    min_height = min_height * 35
+  }
 
   for( var i = 0; i< a.length; i++)
   {
-    valuex = (b[i] * value_xcoord) + X
-    valuey = (a[i] * value_ycoord) + Y
-    NewY = (myCanvas.height/1.5) - valuey
-
-    newboi.push([valuex,NewY])
+    if( isNaN(a[i]) == true || isNaN(b[i]) == true)
+    {
+      
+    }
+    else
+    {
+      valuex = (b[i] * value_xcoord) + X
+      valuey = (a[i] * value_ycoord) + Y
+      NewY = (myCanvas.height+ (min_height)) - valuey
+      newboi.push([valuex,NewY])
+    }     
   }
 
   if(d == 0)
@@ -182,9 +261,17 @@ function reverse_level()
       d =0
     }
 
+    var r = 0, k = 0, latestI = 0
   for ( var i = 0; i < newboi.length; i++)
-    {   
-      drawcircle("black", newboi[i][0], newboi[i][1], i +1)
+    {
+      r = r + 1
+      if( i == Math.abs( newI[k] - k))
+      {
+        latestI = newI[k] //41
+        k = k + 1
+        r = 1
+      }   
+      drawcircle("black", newboi[i][0], newboi[i][1], r)
       //draw horizontal line
       if( i != newboi.length - 1)
       {
@@ -203,6 +290,7 @@ function reverse_level()
   reader.readAsText(file);
 
   reader.onload = () => {
+    var totalasb =1
     pipe=[], ground =[], chainage =[]
     const fileContents = reader.result;
     const lines = fileContents.split('\n');
@@ -216,10 +304,28 @@ function reverse_level()
         chainage.push(Number(columns[2]));
       }
     }
-    
-    alert( pipe.length +" points have been inserted." )
+
+    for( var i = 0; i < pipe.length; i++)
+    {
+      if(isNaN(pipe[i]) == true)
+      {
+        newI.push(i)
+        totalasb = totalasb + 1
+        pipe[i] = 'a'
+        ground[i] = 'a'
+        chainage[i] = 'a'
+      }
+    }
+
+
+    // console.log('pipe',pipe)
+    // console.log('ground',ground)
+    // console.log('chainage',chainage)
     drawTable()
     redraw()
+    console.log('newI',newI)
+    console.log('pipe.length',pipe.length)
+    alert( pipe_pixel.length +" points have been inserted.\n" + totalasb +' Drawing' )
   };
 });
 
@@ -235,7 +341,7 @@ off_lbtn.addEventListener("change", function(){
 })
 
 
-canvasElem.addEventListener("mousedown", function(event) {
-    printMousePos(canvasElem,event)
-    redraw()
-}) 
+// canvasElem.addEventListener("mousedown", function(event) {
+//     printMousePos(canvasElem,event)
+//     redraw()
+// }) 

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Casing</title>
+</head>
+<body>
+    <div class="sticky">
+        <button id="open" onclick="changeImage()" style = "cursor: pointer;">
+            <img id="myImage" src="img/right.png" alt="Image 1">
+        </button>
+        <ol id="navbar">
+            <li class="tick"> <input type="file"  accept= "image/jpeg, image/png, application/pdf" name="image" id="imageInput" style="padding-bottom: 10px;"></li>
+            <button style = "cursor: pointer;" id="undo" > Undo</button>
+            <li class="tick"> <input type="checkbox" id="Points"> Points</li>
+            <li class="tick" style="padding-bottom: 15px;"> <input type="checkbox" id="length"> Calculate length</li>
+<!-- 
+            <label> Length: </label> 
+            <div style="display: inline-block;" id="len"></div><br>
+
+            <label> Protection: </label>
+            <input type="text" id="a"><br>
+            
+            <label> Type: </label>
+            <input type="text" id="b"><br>
+            
+            <label> HDD/OpenCut : </label>
+            <input type="text" id="c"><br>
+            
+            <button type="button" id="submit"> submit</button> -->
+            
+            <li>
+            <ul>
+                <div style="overflow-y: scroll; height: 200px;">
+                    <table id="myTable">
+                        <thead>
+                            <tr>
+                                <th>point</th>
+                                <th>Actual Length</th>
+                                <th>Length</th>
+                            </tr>
+                        </thead>
+                        <tbody id="myTableBody"></tbody>
+                    </table>
+                </div>
+            
+                <ul style="display: flex; border: 0; padding: 10px; list-style: none;">
+                </ul>
+                <!-- <li style="padding: 20px;"><button class="animated-button" id="bt" onclick="saveFile()"> Generate Report</button></li> -->
+            </ul>
+        </ol>
+    </div>
+
+    <!-- <div class="layer">
+        <ol style="list-style: none;">
+            <li> <input type="checkbox" id="H_helper"> Horizontal Assist</li>
+            <li> <input type="checkbox" id="L_helper"> Line Assist</li>
+        </ol>
+    </div> -->
+    <div class="canvas_1" id="canvas_1">
+        <div class="profile">
+           
+        </div>
+        <canvas class ="main", width="1000", height="700", id="myCanvas"></canvas>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="button.js"></script>
+
+</body>
+</html>
