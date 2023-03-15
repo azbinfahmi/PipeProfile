@@ -4,8 +4,9 @@ const ctx = canvasElem.getContext('2d');
 const off_pbtn = document.querySelector("#off_p");
 const off_lbtn = document.querySelector("#off_l");
 const textFileInput  = document.getElementById('textInput');
+const Sizebtn = document.getElementById("size")
 var ground = [],pipe = [], chainage =[], newI=[], data =[];
-
+var size = 5
 var pipe_pixel =[], ground_pixel=[], d = 0, asb = 0
 off_pbtn.checked = false
 off_lbtn.checked = false
@@ -194,7 +195,7 @@ function redraw()
   var Y = 35
   maxcanvas_height = (max_height * value_ycoord) + Y
 
-  myCanvas.width = (max_chainage * 5 ) + 200
+  myCanvas.width = (max_chainage * size ) + 200
   myCanvas.height = (maxcanvas_height + 100)
   reverse_level()
   draw_vertical()
@@ -242,7 +243,7 @@ function reverse_level()
     }
     else
     {
-      valuex = (b[i] * value_xcoord) + X
+      valuex = (b[i] * size) + X
       valuey = (a[i] * value_ycoord) + Y
       NewY = (myCanvas.height+ (min_height)) - valuey
       newboi.push([valuex,NewY])
@@ -340,7 +341,11 @@ off_lbtn.addEventListener("change", function(){
     redraw()
 })
 
-
+Sizebtn.addEventListener("click", function(){
+  ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
+  size = Number (prompt("Width Value",5)) 
+  redraw()
+})
 // canvasElem.addEventListener("mousedown", function(event) {
 //     printMousePos(canvasElem,event)
 //     redraw()
