@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styleButton.css">
+
+    <title>Draw PA</title>
+</head>
+<body>
+    <ol style="display: flex; border: 0; list-style: none;">
+        <label> X (West/East) : </label>
+        <li> <input type="text" id="X"></li>
+        <label style="padding-left: 5px;">Y (North/South) : </label>
+        <li> <input type="text" id="Y"></li>
+        <li style="padding-left: 5px;" ><button id="submit1">Submit</button></li>
+    </ol>
+
+    <ol style="display: flex; border: 0; list-style: none;">
+        <label> Distance: </label>
+        <li> <input type="text" id="distance"></li>
+        <label style="padding-left: 5px;">Deg: </label>
+        <li> <input type="text" id="degree"></li>
+        <label style="padding-left: 5px;">Min: </label>
+        <li> <input type="text" id="minute"></li>
+        <label style="padding-left: 5px;">Sec: </label>
+        <li> <input type="text" id="second"></li>
+        <li style="padding-left: 5px;" ><button id="submit2">Submit</button></li>
+        <li style="padding-left: 5px;" ><button id="generate">Generate</button></li>
+    </ol>
+
+    <div id="zoomButton" class="zoom-button">
+        <div class="zoom-icon" id="zoom-in">+</div>
+        <div class="zoom-icon" id="zoom-out">-</div>
+    </div>
+    <div class="sticky">
+        <button id="open" onclick="changeImage()" style = "cursor: pointer;">
+            <img id="myImage" src="img/left.png" alt="Image 1">
+        </button>
+        <ol id="navbar"> 
+            <button id="undo" style="cursor: pointer;">undo</button> <hr>
+            <ul style="list-style: none; display: flex; padding: 0%; padding-top: 10px;">
+                <li style="padding-right: 10px;"> <button id="edit" style="cursor: pointer;">Edit</button></li>
+                <li> <button id="add" style="cursor: pointer;">Add</button></li>
+            </ul>
+            <div style="overflow-y: scroll; height: 200px;">
+                <table id="myTable">
+                    <thead>
+                        <tr>
+                            <th>point_no</th>
+                            <th>Distance</th>
+                            <th>Deg</th>
+                            <th>Min</th>
+                            <th>Sec</th>
+                        </tr>
+                    </thead>
+                    <tbody id="myTableBody">
+
+                    </tbody>
+                </table>
+
+            </div>  
+        </ol>
+    </div>
+    <div id="canvas-wrapper">
+        <canvas class ="main canvas-container", width="10000", height="10000", id="myCanvas"></canvas>
+    </div>
+
+    <script src="PA.js"></script>
+    <script src="button.js"></script>
+
+</body>
+</html>

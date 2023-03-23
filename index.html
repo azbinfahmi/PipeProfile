@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <link rel="stylesheet" href="style.css">
     <title>Pipe Profile Calculator</title>
 </head>
@@ -21,13 +21,6 @@
             <li class="tick"> <input type="checkbox" id="L_helper"> Line to point Assist</li> 
         </ol>
     </div>
-
-    <!-- <div class="layer">
-        <ol style="list-style: none;">
-            <li> <input type="checkbox" id="H_helper"> Horizontal Assist</li>
-            <li> <input type="checkbox" id="L_helper"> Line Assist</li>
-        </ol>
-    </div> -->
     <div class="canvas_1" id="canvas_1">
         <div class="profile">
             <ul>
@@ -63,7 +56,7 @@
                 </ol>
                 
                 <footer>
-                    <p>&copy; 2023 Pipe Profile Calculator (Beta v1.7)</p>
+                    <p>&copy; 2023 Pipe Profile Calculator (Beta v1.8.2)</p>
                     <p> Developed by AzbinFahmi</p>
                 </footer>
             </ul>
@@ -74,11 +67,17 @@
         </div>
     </div>
 
-    <!-- <div id="zoomButton" class="zoom-button">
-        <div class="zoom-icon">+</div>
-        <div class="zoom-icon">-</div>
-    </div> -->
-
+    <div id="zoomButton" class="zoom-button">
+        <div class="zoom-icon" id="zoom-in">+</div>
+        <div class="zoom-icon" id="zoom-out">-</div>
+    </div>
+    
+    <script>
+        // Disable pinch-to-zoom on mobile devices
+        document.addEventListener('gesturestart', function(e) {
+          e.preventDefault();
+        });
+    </script>
     <script src="data.js"></script>
     <script src="button.js"></script>
 

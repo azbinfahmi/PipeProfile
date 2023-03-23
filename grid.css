@@ -1,0 +1,27 @@
+.grid-container {
+    display: grid;
+    grid-template-columns: 10% 90%;
+  }
+  
+  /* @media (max-width: 768px) {
+    .grid-container {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .grid-container {
+      grid-template-columns: minmax(250px, 30%) minmax(600px, 70%);
+    }
+  }
+  
+  @media (min-width: 1025px) {
+    .grid-container {
+      grid-template-columns: minmax(300px, 30%) minmax(800px, 70%);
+    }
+  } */
+  
+  .grid-item {
+    border: 1px solid black;
+    padding: 10px;
+  }

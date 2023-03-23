@@ -7,7 +7,6 @@ var arr_valueFirst =[], arr_valueSecond =[], valueFirst=0, valueSecond=0, checki
 var pipelength = 0, mark1 = 0, mark2 = 0, markclone1 =0, markclone2 = 0,  shortcut = 0;
 var myImage, Scale
 var edit_row = -1, del = -1,c_width=0, c_height =0, edit_what = 0
-var zoomLevel = 1
 
 const undobtn = document.querySelector("#undo");
 const lengthbtn = document.querySelector("#length");
@@ -15,7 +14,6 @@ const depthbtn = document.querySelector("#checkX");
 const pointbtn = document.querySelector("#Points");
 const HHbtn = document.querySelector("#H_helper")
 const LHbtn = document.querySelector("#L_helper")
-const opnbtn = document.querySelector("#open")
 const editbtn = document.querySelector("#edit")
 const delbtn = document.querySelector("#delete")
 const addbtn = document.querySelector("#add")
@@ -33,14 +31,16 @@ function Load_Image()
 {
   let imgInput = document.getElementById('imageInput');
   imgInput.addEventListener('change', function(e) {
+    scale = 1 // ni untuk scale zoom in/out
     const reader = new FileReader();
     if(e.target.files )
     {
-      Scale = Number(prompt("Add a scale to the image","1"))
+      Scale = (prompt("Add a scale to the image","1"))
       if (Scale == 0)
       {
         Scale = 1
       }
+      
       let imageFile = e.target.files[0]; //here we get the image file
       reader.readAsDataURL(imageFile);
       reader.onloadend = function (e) 
@@ -55,26 +55,31 @@ function Load_Image()
           myContext.drawImage(myImage,0,0, myImage.width *Scale, myImage.height *Scale); // Draws the image on canvas
           c_height = myCanvas.height
           c_width = myCanvas.width
+
+          // console.log('canvas.width',myCanvas.width)
+          // console.log('canvas.height',myCanvas.height)
+          // console.log('myImage',myImage)
         }
       }
-
       //use for retrieve
       c_height = myCanvas.height
-      c_width = myCanvas.width
+      c_width = myCanvas.width 
     }
   });
 }
 
 //get coordinate when click
 function printMousePos(canvas, event) {
-  let rect = canvas.getBoundingClientRect();
-  let x = event.clientX - rect.left;
-  let y = event.clientY - rect.top;
+  
+  let x = event.offsetX;
+  let y = event.offsetY;
+  console.log('event.offsetY',event.offsetY)
+  x = x / scale
+  y = y / scale
+
   console.log("Coordinate x: " + x, "Coordinate y: " + y);
   coordX.push(x)
   coordY.push(y)
-  lenx.push(x)
-  leny.push(y)
   }
 
 //draw circle function
@@ -83,8 +88,18 @@ function drawcircle(color, a, b, no , i)
   //draw circle
   var c = document.getElementById("myCanvas")
   var ctx = c.getContext("2d");
+  if(scale > 1)
+  {
+    radius = 4 / scale
+  }
+
+  else
+  {
+    radius = 4 * scale
+  }
+  
   ctx.beginPath();
-  ctx.arc(a, b, 4, 0, 2 * Math.PI*2);
+  ctx.arc(a, b, radius, 0, 2 * Math.PI*2);
   ctx.fillStyle =color
   ctx.fill()
   ctx.fillStyle = "black";
@@ -126,10 +141,16 @@ function drawcircle(color, a, b, no , i)
 //draw constant circle
 function drawConstantCircle(event)
 {
-  let rect = canvasElem.getBoundingClientRect();
+  // let rect = canvasElem.getBoundingClientRect();
+  // var mouseX = event.clientX - rect.left;
+  // var mouseY = event.clientY - rect.top;
   // Get mouse position
-  var mouseX = event.clientX - rect.left;
-  var mouseY = event.clientY - rect.top;
+  const x = event.offsetX;
+  const y = event.offsetY;
+
+  // Adjust the position of the circle based on the current scale factor
+  const circleX = x / scale;
+  const circleY = y / scale;
 
   if ( mark1 == mark2 && maxdepth2.length == 2 && pointbtn.checked == true)
   {
@@ -158,15 +179,29 @@ function drawConstantCircle(event)
     }
   }
 
+  else if(lengthbtn.checked == true)
+  {
+    color = "purple"
+  }
+
   else
   {
     color = "black"
   }
   // Draw circle at mouse position
-  radius = 4
+  if(scale > 1)
+  {
+    radius = 4 / scale
+  }
+
+  else
+  {
+    radius = 4 * scale
+  }
+
   ctx.beginPath();
   ctx.fillStyle = color
-  ctx.arc(mouseX, mouseY, radius, 0, 2 * Math.PI);
+  ctx.arc(circleX, circleY, radius, 0, 2 * Math.PI);
   ctx.fill();
   ctx.stroke()
 }
@@ -193,21 +228,34 @@ function drawline(x1,y1,x2,y2)
   }
 }
 
-//draw horrizontal line
+//draw vertical line
 function drawLine(x) {
   // Draw the line
-  ctx.beginPath();
-  ctx.moveTo(x, 0);
-  ctx.lineTo(x, canvasElem.height);
-  ctx.stroke();
+
+  if(myImage == undefined)
+  {
+
+  }
+
+  else
+  {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, myImage.height * Scale);
+    ctx.stroke();
+
+  }
 }
 
 //draw point to next point
 function drawpoint_to_point(event)
 {
-  let rect = canvasElem.getBoundingClientRect();
-  var mouseX = event.clientX - rect.left;
-  var mouseY = event.clientY - rect.top;
+  // let rect = canvasElem.getBoundingClientRect();
+  // var mouseX = event.clientX - rect.left;
+  // var mouseY = event.clientY - rect.top;
+
+  const mouseX = event.offsetX / scale;
+  const mouseY = event.offsetY / scale;
 
   leng1 = pipecoord.length - 1
   leng2 = groundcoord.length - 1
@@ -473,8 +521,8 @@ function redraw()
     }
     else 
     {
-      drawline(maxdepth2[0][1], maxdepth2[0][2], maxdepth2[1][1], maxdepth2[1][2])
-      for (var i= 0; i < total_depth + 1 ; i++ )
+      drawLine(maxdepth2[0][1])
+      for (var i= 0; i < total_depth + 20 ; i++ )
       {
         drawcircle("black", maxdepth2[0][1], maxdepth2[0][2] + (calc * i), 0,i)
       }
@@ -578,6 +626,7 @@ function transf()
   localStorage.setItem("c_height", JSON.stringify(c_height));
   localStorage.setItem("c_width", JSON.stringify(c_width));
 }
+
 //alert when tick the depth point button
 depthbtn.addEventListener('change',function(){
 
@@ -617,6 +666,12 @@ pointbtn.addEventListener('change',function(){
       alert("Find the depth point first")
       pointbtn.checked = false
       depthbtn.checked = true
+    }
+
+    else
+    {
+      console.log('azim46')
+      redraw()
     }
   }
 })
@@ -859,8 +914,7 @@ addbtn.addEventListener("click", function(){
 //make vertical line
 canvasElem.addEventListener('mousemove', function(event) {
 
-  //horrizontal line
-  const x = event.offsetX;
+  const x = event.offsetX / scale;
   ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
   redraw()
   if (depthbtn.checked == true)
@@ -870,10 +924,7 @@ canvasElem.addEventListener('mousemove', function(event) {
   //horinzontal assist
   if (HHbtn.checked == true)
   {
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, canvasElem.height);
-    ctx.stroke();
+    drawLine(x)
   }
 
   if(LHbtn.checked == true && pointbtn.checked == true)
@@ -919,12 +970,11 @@ canvasElem.addEventListener("mousedown", function(e)
           total_pixel = maxdepth2[1][2] - maxdepth2[0][2]
           calc = total_pixel / total_depth
           // console.log(maxdepth2)
-          for (var i= 0; i < total_depth + 1 ; i++ )
+          for (var i= 0; i < total_depth + 20 ; i++ )
           {
             drawcircle("black", maxdepth2[0][1], maxdepth2[0][2] + (calc * i), 0, i)
           }
-          
-          drawline(maxdepth2[0][1], maxdepth2[0][2], maxdepth2[1][1], maxdepth2[1][2])         
+          drawLine(maxdepth2[0][1])         
         }
       }     
     }
@@ -1107,6 +1157,7 @@ canvasElem.addEventListener("mousedown", function(e)
 
           else
           {
+            var p = 0
             mark2 =mark2+1
             groundlevel=[]
             combine=[]
@@ -1117,7 +1168,17 @@ canvasElem.addEventListener("mousedown", function(e)
             
             if (pipelength == 0 && shortcut == 0)
             {
-              pipelength = prompt("Insert pipe length value")
+              var p = prompt("Insert pipe length value")
+              if(p == undefined)
+              {
+                mark2 = mark2 - 1
+                groundcoord.pop()
+              }
+
+              else
+              {
+                pipelength = p
+              }
             }
 
             else
@@ -1127,37 +1188,41 @@ canvasElem.addEventListener("mousedown", function(e)
                 save_values[len][0],save_values[len][1])
               shortcut = 0
             }
-            pipelevel.push(level(pipecoord[mark1 - 1][1]))
-            //console.log('pipelevel',pipelevel)
-            var combine =pipelevel.concat(groundlevel)
-            data.push([combine[0],combine[1], Number(pipelength)])
-            // console.log('data:',data)
 
-            //draw line for each point
-            if(groundcoord.length > 1)
+            if( p != undefined || p!=null)
             {
-              drawline(groundcoord[mark1-2][0], groundcoord[mark1-2][1], groundcoord[mark1-1][0], groundcoord[mark1-1][1])
-            }
+              pipelevel.push(level(pipecoord[mark1 - 1][1]))
+              //console.log('pipelevel',pipelevel)
+              var combine =pipelevel.concat(groundlevel)
+              data.push([combine[0],combine[1], Number(pipelength)])
+              // console.log('data:',data)
 
-            //create table and insert data
-            const tableBody = document.getElementById("myTableBody");
-            table_data = data
+              //draw line for each point
+              if(groundcoord.length > 1)
+              {
+                drawline(groundcoord[mark1-2][0], groundcoord[mark1-2][1], groundcoord[mark1-1][0], groundcoord[mark1-1][1])
+              }
 
-            // Start removing from the last row to the first one
-            while(tableBody.firstChild)
-            {
-              tableBody.removeChild(tableBody.firstChild);
-            }
-            for (let i = 0; i < table_data.length; i++) 
-            {
-              const row = tableBody.insertRow();
-              const cell1 = row.insertCell(0);
-              cell1.innerHTML = i+1;
-              
-              for (let j = 0; j < table_data[i].length; j++) {
-                const cell2 = row.insertCell(j+1);
-                num = Math.round(table_data[i][j] * 100) / 100
-                cell2.innerHTML = num.toFixed(2);
+              //create table and insert data
+              const tableBody = document.getElementById("myTableBody");
+              table_data = data
+
+              // Start removing from the last row to the first one
+              while(tableBody.firstChild)
+              {
+                tableBody.removeChild(tableBody.firstChild);
+              }
+              for (let i = 0; i < table_data.length; i++) 
+              {
+                const row = tableBody.insertRow();
+                const cell1 = row.insertCell(0);
+                cell1.innerHTML = i+1;
+                
+                for (let j = 0; j < table_data[i].length; j++) {
+                  const cell2 = row.insertCell(j+1);
+                  num = Math.round(table_data[i][j] * 100) / 100
+                  cell2.innerHTML = num.toFixed(2);
+                }
               }
             }
             pipelength = 0, pipelevel=[]

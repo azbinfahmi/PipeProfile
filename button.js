@@ -1,3 +1,10 @@
+const zoomInButton = document.querySelector('#zoom-in');
+const zoomOutButton = document.querySelector('#zoom-out');
+const canvas = document.getElementById('myCanvas');
+const opnbtn = document.querySelector("#open")
+
+let scale = 1
+
 //change open button
 function changeImage() {
     var image = document.getElementById("myImage");
@@ -28,14 +35,14 @@ opnbtn.addEventListener("click", function(){
   
 })
 
-//keypress for undo button
+//shortcut for all the buttons keypress for undo button
 function key_press()
 {
   var isShiftDown = false;
 
  document.addEventListener("keydown", function(event) {
-  // Check for "Shift" key
-  if (event.keyCode === 16) {
+  // Check for "Shift" key and "Ctrl" key
+  if (event.keyCode === 16 || event.keyCode === 17) {
     isShiftDown = true;
   }
 
@@ -44,7 +51,7 @@ function key_press()
     undobtn.click();
   }
 
-//T
+  //O
   if (event.keyCode === 79 && isShiftDown)
   {
     opnbtn.click()
@@ -53,7 +60,6 @@ function key_press()
   //add (A)
   if(event.keyCode === 65 && isShiftDown)
   {
-    console.log("Azim46")
     addbtn.click()
   }
 
@@ -67,6 +73,23 @@ function key_press()
   if(event.keyCode === 68 && isShiftDown)
   {
     delbtn.click()
+  }
+
+
+  //zoom in and out button 187 is "+" , 189 is "-"
+  if((event.key === '+') || (event.key === '-'))
+  {
+    if(event.key === '+')
+    {
+      zoomInButton.click()
+      console.log("zom in")
+    }
+
+    else
+    {
+      zoomOutButton.click()
+      console.log("zom out")
+    }
   }
 
   //can tick point and length btn when depth button is complete
@@ -128,69 +151,60 @@ function key_press()
   }
   })
 
+
   document.addEventListener("keyup", function(event) {
     // Check for "Shift" key
-    if (event.keyCode === 16) {
+    if (event.keyCode === 16 || event.keyCode === 17) {
       isShiftDown = false;
     }
   });
 }
+
+// Add click event listeners to the zoom buttons
+zoomInButton.addEventListener('click', () => {
+ // Increase the scale factor by 0.1
+ scale = scale + 0.1;
+ // Clamp the scale factor to a reasonable range
+ scale = Math.max(0.1, Math.min(scale, 10));
+console.log('scale',scale)
+ // Apply the new scale factor to the canvas
+canvas.width = myImage.width * Scale *scale
+canvas.height = myImage.height * Scale *scale
+ctx.setTransform(scale, 0, 0, scale, 0, 0);
+
+  // console.log('canvas.width',canvas.width)
+
+ // Redraw the circle at the new position
+ const circleX = canvas.width / 2 / scale;
+ const circleY = canvas.height / 2 / scale;
+ ctx.clearRect(0, 0, canvas.width, canvas.height);
+ ctx.beginPath();
+ ctx.arc(circleX, circleY, 10, 0, Math.PI * 2);
+ ctx.fill();
+ redraw()
+});
+
+zoomOutButton.addEventListener('click', () => {
+ // Decrease the scale factor by 0.1
+ scale = scale - 0.1;
+ console.log('scale',scale)
+
+ // Clamp the scale factor to a reasonable range
+ scale = Math.max(0.1, Math.min(scale, 10));
+
+ // Apply the new scale factor to the canvas
+ canvas.width = myImage.width * Scale *scale
+canvas.height = myImage.height * Scale *scale
+ ctx.setTransform(scale, 0, 0, scale, 0, 0);
+
+ // Redraw the circle at the new position
+ const circleX = canvas.width / 2 / scale;
+ const circleY = canvas.height / 2 / scale;
+ ctx.clearRect(0, 0, canvas.width, canvas.height);
+ ctx.beginPath();
+ ctx.arc(circleX, circleY, 10, 0, Math.PI * 2);
+ ctx.fill();
+ redraw()
+});
+
 key_press()
-
-
-// var canvas = document.getElementById('myCanvas');
-// // Get a reference to the zoom button
-// var zoomButton = document.getElementById('zoomButton');
-// var context = canvas.getContext('2d');
-
-// // Set initial zoom level
-// var zoomLevel = 1;
-
-// // Add mousedown event listener to the zoom button
-// zoomButton.addEventListener('mousedown', function(event) {
-//   // Get the starting mouse position
-//   var startX = event.clientX;
-//   var startY = event.clientY;
-  
-//   // Add mousemove event listener to the document
-//   document.addEventListener('mousemove', handleMouseMove);
-  
-//   // Add mouseup event listener to the document
-//   document.addEventListener('mouseup', handleMouseUp);
-  
-//   // Prevent default browser behavior
-//   event.preventDefault();
-  
-//   // Define the mousemove event handler function
-//   function handleMouseMove(event) {
-//     console.log('zoomLevel1',zoomLevel)
-//     // Calculate the distance moved by the mouse
-//     var deltaX = event.clientX - startX;
-//     var deltaY = event.clientY - startY;
-    
-//     // Adjust the zoom level based on the distance moved
-//     if (deltaY < 0) {
-//       // Zoom in
-//       zoomLevel *= 1.1;
-//     } else if (deltaY > 0) {
-//       // Zoom out
-//       zoomLevel /= 1.1;
-//     }
-    
-//     // Update the CSS transform property of the canvas element to apply the zoom level
-//     canvas.style.transform = 'scale(' + zoomLevel + ')';
-//     // Update the starting mouse position
-//     startX = event.clientX;
-//     startY = event.clientY;
-//   }
-  
-//   // Define the mouseup event handler function
-//   function handleMouseUp(event) {
-//     console.log('zoomLevel2',zoomLevel)
-//     // Remove the mousemove event listener from the document
-//     document.removeEventListener('mousemove', handleMouseMove);
-    
-//     // Remove the mouseup event listener from the document
-//     document.removeEventListener('mouseup', handleMouseUp);
-//   }
-// });

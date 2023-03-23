@@ -1,13 +1,16 @@
 
-var data =[], coordX = [], coordY= [], point=[], save_length=[], arr_valueFirst=[], save_values=[];
+var data =[], coordX = [], coordY= [], point=[], save_length=[], arr_valueFirst=[], save_values=[], save_length_y=[];
 var length = 0, mark = 0, valueFirst=0, valueSecond =0, pipelength = 0, shortcut = 0
 var m_length =[], Scale = 1, img_det =[], check = 0
+var id =[], length=[], actual_length =[]
 const canvasElem = document.getElementById("myCanvas");
 const ctx = canvasElem.getContext('2d');
 var tableBody = document.getElementById('myTableBody');
 const pointbtn = document.querySelector("#Points");
 const lengthbtn = document.querySelector("#length");
 const undobtn = document.querySelector("#undo");
+const textFileInput  = document.getElementById('textInput');
+
 pointbtn.checked = true
 
 function Load_Image()
@@ -59,13 +62,27 @@ function drawcircle(color, a, b, no)
   ctx.arc(a, b, 4, 0, 2 * Math.PI*2);
   ctx.fillStyle =color
   ctx.fill()
-  ctx.fillStyle = "black";
-  ctx.font = "11px Arial";
-  ctx.textAlign = "center";
+  
 
-  var name = "p" + Number(no)
-  ctx.fillText(name, a - 22, b-10 );
+  if (no != 0.5)
+  {
+    ctx.fillStyle = "black";
+    ctx.font = "11px Arial";
+    ctx.textAlign = "center";
+    var name = "p" + Number(no)
+    ctx.fillText(name, a - 22, b-10 );
+  }
+
+  // else if ( no == 0.5)
+  // {
+  //   ctx.fillStyle = "black";
+  //   ctx.font = "11px Arial";
+  //   ctx.textAlign = "center";
+  //   ctx.fillText(name, a - 22, b-10 );
+  // }
+
   ctx.stroke();
+ 
 }
 
 function drawConstantCircle(event)
@@ -74,7 +91,16 @@ function drawConstantCircle(event)
   // Get mouse position
   var mouseX = event.clientX - rect.left;
   var mouseY = event.clientY - rect.top;
-  color = "black"
+
+  if( pointbtn.checked == true)
+  {
+    color = "black"
+  }
+
+  if( lengthbtn.checked == true)
+  {
+    color = "purple"
+  }
   
   // Draw circle at mouse position
   radius = 4
@@ -92,6 +118,29 @@ function calc_length(arr_valueFirst, arr_valueSecond, valueFirst, valueSecond)
   var value_total = (val_diff / pix_diff) * pipedepth_to_pipelength; // 30/20 = 1.5 * 12 = 18
   var final_ans = valueSecond - value_total;
   return final_ans
+}
+
+//draw line
+function drawline(x1,y1,x2,y2)
+{
+  var c = document.getElementById("myCanvas")
+  if (c.getContext)
+  {
+    var context = c.getContext("2d");
+    // Begin the path
+    context.beginPath();
+
+    context.lineCap = "round";
+    // Starting point
+    context.moveTo(x1, y1);
+
+    // End point
+    context.lineTo(x2, y2);
+    ctx.lineWidth = 2
+    // Stroke will make the line visible
+    context.stroke();
+
+  }
 }
 
 function point_undo()
@@ -186,6 +235,7 @@ function point_undo()
 
 function redraw()
 {
+  
   if (Scale > 0)
   {
     ctx.drawImage(myImage,0,0, myImage.width *Scale, myImage.height *Scale);
@@ -207,6 +257,23 @@ function redraw()
       drawcircle("black", point[o][0], point[o][1], o +1 )
     }
   }
+
+  if(arr_valueFirst.length > 0)
+  {
+    
+    drawcircle("purple", arr_valueFirst[0], arr_valueFirst[1], 0.5)
+  }
+
+  if ( save_length.length > 0)
+  {
+    len = save_length.length - 1
+    drawcircle("purple", save_length[len][0],save_length_y[len][0],0.5)
+    drawcircle("purple", save_length[len][1],save_length_y[len][1],0.5)
+
+    drawline(save_length[len][0],save_length_y[len][0],save_length[len][1],save_length_y[len][1])
+  }
+  
+
   
 }
 
@@ -270,6 +337,61 @@ undobtn.addEventListener('click',function(){
   point_undo()
 })
 
+textFileInput.addEventListener('change', () => {
+  ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
+  const file = textFileInput.files[0];
+  const reader = new FileReader();
+
+  reader.readAsText(file);
+
+  reader.onload = () => {
+    id =[], length=[], actual_length =[], data =[]
+    const fileContents = reader.result;
+    const lines = fileContents.split('\n');
+
+    for (let i = 1; i < lines.length; i++) { // start at i = 1 to skip header row
+      const columns = lines[i].split('\t');
+
+      if (columns.length === 3) {
+        // id.push(Number(columns[0]));
+        length.push(Number(columns[1]));
+        actual_length.push(Number(columns[2]));
+      }
+    }
+    
+    for( var i = 0; i < actual_length.length; i++)
+    {
+      data.push([length[i], actual_length[i]])
+    }
+    const tableBody = document.getElementById("myTableBody");
+    table_data = data
+    
+    while(tableBody.firstChild)
+    {
+      tableBody.removeChild(tableBody.firstChild);
+    }
+
+    if(data.length > 0)
+    {
+      for (let i = 0; i < table_data.length; i++) 
+      {
+        const row = tableBody.insertRow();
+        const cell1 = row.insertCell(-1);
+        cell1.innerHTML = i+1;
+        
+        for (let j = 0; j < table_data[i].length; j++) {
+          const cell2 = row.insertCell(j+1);
+          cell2.innerHTML = table_data[i][j];
+        }
+      }
+    }
+
+    alert( actual_length.length +" points have been inserted." )
+    redraw()
+  };
+});
+
+
 canvasElem.addEventListener('mousemove', function(event) {
   const x = event.offsetX;
   ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
@@ -323,21 +445,22 @@ canvasElem.addEventListener("mousedown", function(e)
 
       m_length.push(length)
       k = m_length.length - 1
-      console.log()
-      if(m_length.length == 1)
+
+      if(data.length == 0)
       {
         data.push([length, length])
       }
 
       else
       {
-        minus = m_length[k] - m_length[k-1]
+        len = data.length - 1
+        minus = m_length[k] - data[len][0]
         data.push([length, minus.toFixed(2)])
       }
      
       const tableBody = document.getElementById("myTableBody");
       table_data = data
-    
+      
       while(tableBody.firstChild)
       {
         tableBody.removeChild(tableBody.firstChild);
@@ -373,6 +496,7 @@ canvasElem.addEventListener("mousedown", function(e)
          {
            arr_valueFirst = [], arr_valueSecond=[]
            arr_valueFirst.push(coordX[getcoord], coordY[getcoord]);
+           drawcircle("purple",coordX[getcoord],coordY[getcoord],0.5)
            valueFirst = Number(prompt("1st pipelength value"));
          }
  
@@ -387,15 +511,23 @@ canvasElem.addEventListener("mousedown", function(e)
                alert("Please insert pipelength value")
              }
            }
+
            if(point.length > 0)
           {
             pipelength = calc_length(arr_valueFirst[0], arr_valueSecond[0], valueFirst, valueSecond);
           }
            //store x coordinate for length and its value
           save_length.push([arr_valueFirst[0], arr_valueSecond[0]])
+          save_length_y.push([arr_valueFirst[1], arr_valueSecond[1]])
           save_values.push([valueFirst, valueSecond])
           valueSecond = 0, arr_valueFirst=[]
           lengthbtn.checked= false, pointbtn.checked=true
+          len = save_length.length - 1
+
+          drawcircle("purple", save_length[len][0],save_length_y[len][0],0.5)
+          drawcircle("purple", save_length[len][1],save_length_y[len][1],0.5)  
+
+          drawline(save_length[len][0],save_length_y[len][0],save_length[len][1],save_length_y[len][1])
         }
       }
     }
@@ -403,4 +535,5 @@ canvasElem.addEventListener("mousedown", function(e)
   
   
 });
+
 Load_Image()
