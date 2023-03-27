@@ -8,6 +8,7 @@ var pipelength = 0, mark1 = 0, mark2 = 0, markclone1 =0, markclone2 = 0,  shortc
 var myImage, Scale
 var edit_row = -1, del = -1,c_width=0, c_height =0, edit_what = 0
 
+const imgInput = document.getElementById('imageInput');
 const undobtn = document.querySelector("#undo");
 const lengthbtn = document.querySelector("#length");
 const depthbtn = document.querySelector("#checkX");
@@ -17,7 +18,6 @@ const LHbtn = document.querySelector("#L_helper")
 const editbtn = document.querySelector("#edit")
 const delbtn = document.querySelector("#delete")
 const addbtn = document.querySelector("#add")
-
 const canvasElem = document.getElementById("myCanvas");
 const ctx = canvasElem.getContext('2d');
 
@@ -29,7 +29,7 @@ LHbtn.checked = true;
 //Load and display the image into canvas
 function Load_Image()
 {
-  let imgInput = document.getElementById('imageInput');
+  
   imgInput.addEventListener('change', function(e) {
     scale = 1 // ni untuk scale zoom in/out
     const reader = new FileReader();
@@ -58,14 +58,15 @@ function Load_Image()
 
           // console.log('canvas.width',myCanvas.width)
           // console.log('canvas.height',myCanvas.height)
-          // console.log('myImage',myImage)
+          // console.log('myImage',myImage) 
         }
       }
       //use for retrieve
       c_height = myCanvas.height
-      c_width = myCanvas.width 
+      c_width = myCanvas.width
     }
   });
+
 }
 
 //get coordinate when click
@@ -73,7 +74,6 @@ function printMousePos(canvas, event) {
   
   let x = event.offsetX;
   let y = event.offsetY;
-  console.log('event.offsetY',event.offsetY)
   x = x / scale
   y = y / scale
 
@@ -485,9 +485,9 @@ function point_undo()
 
 function calc_length(arr_valueFirst, arr_valueSecond, valueFirst, valueSecond)
 {
-  var pix_diff = arr_valueSecond - arr_valueFirst;// 120 - 100 = 20
-  var val_diff =  valueSecond - valueFirst;//50 - 20 = 30
-  var pipedepth_to_pipelength = arr_valueSecond - pipecoord[mark1-1][0]; // 120 - 108 = 12
+  var pix_diff = Math.abs(arr_valueSecond - arr_valueFirst)// 120 - 100 = 20  100 - 120 = -20
+  var val_diff =  Math.abs(valueSecond - valueFirst);//50 - 20 = 30
+  var pipedepth_to_pipelength = Math.abs(arr_valueSecond - pipecoord[mark1-1][0]); // 120 - 108 = 12
   var value_total = (val_diff / pix_diff) * pipedepth_to_pipelength; // 30/20 = 1.5 * 12 = 18
   var final_ans = valueSecond - value_total;
   return final_ans
@@ -556,27 +556,66 @@ function redraw()
   //check if point can be calculated
   if (save_values.length > 0 && pipecoord.length > 0)
   {
-    if((pipecoord[pipecoord.length-1][0] > save_length[save_length.length-1][0]) && (pipecoord[pipecoord.length-1][0] < save_length[save_length.length-1][1]))
+    if(save_length[save_length.length-1][0] < save_length[save_length.length-1][1] )
     {
-      if(mark1!= mark2)
+      if((pipecoord[pipecoord.length-1][0] > save_length[save_length.length-1][0]) && (pipecoord[pipecoord.length-1][0] < save_length[save_length.length-1][1]))
       {
-        drawcircle("green",pipecoord[pipecoord.length-1][0],pipecoord[pipecoord.length-1][1], mark1)
+        if(mark1!= mark2)
+        {
+          drawcircle("green",pipecoord[pipecoord.length-1][0],pipecoord[pipecoord.length-1][1], 0.5)
+          len = save_values.length - 1
+          pipelength = calc_length(save_length[len][0], save_length[len][1], 
+            save_values[len][0],save_values[len][1])
+          // alert('pipe length value for current point is '+ pipelength.toFixed(2))
+          shortcut = 1
+        }            
       }
-      //this variable is used in calculate length
-      shortcut = 1
     }
+
+    else if (save_length[save_length.length-1][0] > save_length[save_length.length-1][1] )
+    {
+      if((pipecoord[pipecoord.length-1][0] > save_length[save_length.length-1][1]) && (pipecoord[pipecoord.length-1][0] < save_length[save_length.length-1][0]))
+      {
+        if(mark1!= mark2)
+        {
+          drawcircle("green",pipecoord[pipecoord.length-1][0],pipecoord[pipecoord.length-1][1], 0.5)
+          len = save_values.length - 1
+          pipelength = calc_length(save_length[len][0], save_length[len][1], 
+            save_values[len][0],save_values[len][1])
+          // alert('pipe length value for current point is '+ pipelength.toFixed(2))
+          shortcut = 1
+        }            
+      }
+    } 
     
     if(edit_row >= 0)
     {
-      if((pipecoord[edit_row][0] > save_length[save_length.length-1][0]) && (pipecoord[edit_row][0] < save_length[save_length.length-1][1]))
+      if(save_length[save_length.length-1][0] < save_length[save_length.length-1][1] )
       {
-        if(markclone1!= markclone2)
+        if((pipecoord[edit_row][0] > save_length[save_length.length-1][0]) && (pipecoord[edit_row][0] < save_length[save_length.length-1][1]))
         {
-          drawcircle("green",pipecoord[edit_row][0],pipecoord[edit_row][1], edit_row +1)
+          if(markclone1!= markclone2)
+          {
+            drawcircle("green",pipecoord[edit_row][0],pipecoord[edit_row][1], edit_row +1)
+          }
+          //this variable is used in calculate length
+          shortcut = 1
         }
-        //this variable is used in calculate length
-        shortcut = 1
       }
+
+      else if (save_length[save_length.length-1][0] > save_length[save_length.length-1][1] )
+      {
+        if((pipecoord[edit_row][0] > save_length[save_length.length-1][1]) && (pipecoord[edit_row][0] < save_length[save_length.length-1][0]))
+        {
+          if(markclone1!= markclone2)
+          {
+            drawcircle("green",pipecoord[edit_row][0],pipecoord[edit_row][1], edit_row +1)
+          }
+          //this variable is used in calculate length
+          shortcut = 1
+        }
+      }
+      
     }
   }
 
@@ -957,6 +996,10 @@ canvasElem.addEventListener("mousedown", function(e)
           maxdepth2.push(maxdepth)
           drawcircle("black", coordX[lastx], coordY[lasty], 0)
           firstX = lastx
+          if(depth == null)
+          {
+            undobtn.click()
+          }
           // alert("Click at the minimum depth point on the graph.")
         }
         else
@@ -970,11 +1013,19 @@ canvasElem.addEventListener("mousedown", function(e)
           total_pixel = maxdepth2[1][2] - maxdepth2[0][2]
           calc = total_pixel / total_depth
           // console.log(maxdepth2)
-          for (var i= 0; i < total_depth + 20 ; i++ )
+          if(depth != null)
           {
-            drawcircle("black", maxdepth2[0][1], maxdepth2[0][2] + (calc * i), 0, i)
+            for (var i= 0; i < total_depth + 20 ; i++ )
+            {
+              drawcircle("black", maxdepth2[0][1], maxdepth2[0][2] + (calc * i), 0, i)
+            }
+            drawLine(maxdepth2[0][1])
           }
-          drawLine(maxdepth2[0][1])         
+          
+          if(depth == null)
+          {
+            undobtn.click()
+          }        
         }
       }     
     }
@@ -1129,17 +1180,38 @@ canvasElem.addEventListener("mousedown", function(e)
 
         if (save_values.length > 0)
         {
-          if((pipecoord[pipecoord.length-1][0] > save_length[save_length.length-1][0]) && (pipecoord[pipecoord.length-1][0] < save_length[save_length.length-1][1]))
+          // console.log('pipecoord[pipecoord.length-1][0]',pipecoord[pipecoord.length-1][0])
+          // console.log('save_length[save_length.length-1][0]',save_length[save_length.length-1][0])
+          if(save_length[save_length.length-1][0] < save_length[save_length.length-1][1] )
           {
-            if(mark1!= mark2)
+            if((pipecoord[pipecoord.length-1][0] > save_length[save_length.length-1][0]) && (pipecoord[pipecoord.length-1][0] < save_length[save_length.length-1][1]))
             {
-              drawcircle("green",pipecoord[pipecoord.length-1][0],pipecoord[pipecoord.length-1][1], 0.5)
-              len = save_values.length - 1
-              pipelength = calc_length(save_length[len][0], save_length[len][1], 
-                save_values[len][0],save_values[len][1])
-              // alert('pipe length value for current point is '+ pipelength.toFixed(2))
-              shortcut = 1
-            }            
+              if(mark1!= mark2)
+              {
+                drawcircle("green",pipecoord[pipecoord.length-1][0],pipecoord[pipecoord.length-1][1], 0.5)
+                len = save_values.length - 1
+                pipelength = calc_length(save_length[len][0], save_length[len][1], 
+                  save_values[len][0],save_values[len][1])
+                // alert('pipe length value for current point is '+ pipelength.toFixed(2))
+                shortcut = 1
+              }            
+            }
+          }
+
+          else if (save_length[save_length.length-1][0] > save_length[save_length.length-1][1] )
+          {
+            if((pipecoord[pipecoord.length-1][0] > save_length[save_length.length-1][1]) && (pipecoord[pipecoord.length-1][0] < save_length[save_length.length-1][0]))
+            {
+              if(mark1!= mark2)
+              {
+                drawcircle("green",pipecoord[pipecoord.length-1][0],pipecoord[pipecoord.length-1][1], 0.5)
+                len = save_values.length - 1
+                pipelength = calc_length(save_length[len][0], save_length[len][1], 
+                  save_values[len][0],save_values[len][1])
+                // alert('pipe length value for current point is '+ pipelength.toFixed(2))
+                shortcut = 1
+              }            
+            }
           }        
         }
       }
@@ -1330,24 +1402,28 @@ let saveFile = () =>
   // console.log('savedata1:\n',savedata1)
   let savedata2 ='p_level\t' + 'g_level\t' + 'length';
   const textToBLOB = new Blob([savedata2,savedata1], {type: 'text/plain'});
-  const sFileName = prompt("Insert file name?")
-  alert(data.length + " points have been exported")
-
-  let newLink = document.createElement("a");
-  newLink.download = sFileName;
-
-  if (window.webkitURL != null) 
+  const sFileName = prompt("Insert file name?", imgInput.files[0].name) + ".txt"
+  if(sFileName != null)
   {
-    newLink.href = window.webkitURL.createObjectURL(textToBLOB);
-  }
-  else 
-  {
-    newLink.href = window.URL.createObjectURL(textToBLOB);
-    newLink.style.display = "none";
-    document.body.appendChild(newLink);
-  }
+    alert(data.length + " points have been exported")
 
-  newLink.click(); 
+    let newLink = document.createElement("a");
+    newLink.download = sFileName;
+
+    if (window.webkitURL != null) 
+    {
+      newLink.href = window.webkitURL.createObjectURL(textToBLOB);
+    }
+    else 
+    {
+      newLink.href = window.URL.createObjectURL(textToBLOB);
+      newLink.style.display = "none";
+      document.body.appendChild(newLink);
+    }
+
+    newLink.click();
+  }
+   
 }
 
 Load_Image()
