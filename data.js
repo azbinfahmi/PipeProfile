@@ -20,7 +20,8 @@ const delbtn = document.querySelector("#delete")
 const addbtn = document.querySelector("#add")
 const canvasElem = document.getElementById("myCanvas");
 const ctx = canvasElem.getContext('2d');
-
+const depth_number= document.querySelector("#depth_number")
+const length_number= document.querySelector("#length_number")
 depthbtn.checked = true;
 HHbtn.checked = true;
 LHbtn.checked = true;
@@ -483,6 +484,17 @@ function point_undo()
   }
 }
 
+function calc_length_display(arr_valueFirst, arr_valueSecond, valueFirst, valueSecond, x)
+{
+  var pix_diff = Math.abs(arr_valueSecond - arr_valueFirst)// 120 - 100 = 20  100 - 120 = -20
+  var val_diff =  Math.abs(valueSecond - valueFirst);//50 - 20 = 30
+  var pipedepth_to_pipelength = Math.abs(arr_valueSecond - x); // 120 - 108 = 12
+  var value_total = (val_diff / pix_diff) * pipedepth_to_pipelength; // 30/20 = 1.5 * 12 = 18
+  var final_ans = valueSecond - value_total;
+  return final_ans
+}
+
+
 function calc_length(arr_valueFirst, arr_valueSecond, valueFirst, valueSecond)
 {
   var pix_diff = Math.abs(arr_valueSecond - arr_valueFirst)// 120 - 100 = 20  100 - 120 = -20
@@ -666,6 +678,47 @@ function transf()
   localStorage.setItem("c_width", JSON.stringify(c_width));
 }
 
+//display depth and length
+function display_value(x,y)
+{
+  //to display depth value
+  depth_number.innerHTML = level(y).toFixed(2) + "   ";
+
+  //to display length
+  if (save_values.length > 0)
+  {
+    if(save_length[save_length.length-1][0] < save_length[save_length.length-1][1] )
+    {
+      if((x > save_length[save_length.length-1][0]) && (x < save_length[save_length.length-1][1]))
+      {
+        len = save_values.length - 1
+        pipelength = calc_length_display(save_length[len][0], save_length[len][1], 
+          save_values[len][0],save_values[len][1],x)
+        length_number.innerHTML =pipelength.toFixed(2) + " ";
+      }
+
+      else
+      {
+        length_number.innerHTML = "unknown" + " ";
+      }
+    }
+
+    else if (save_length[save_length.length-1][0] > save_length[save_length.length-1][1] )
+    {
+      if((x > save_length[save_length.length-1][1]) && (x < save_length[save_length.length-1][0]))
+      {
+        len = save_values.length - 1
+        pipelength = calc_length_display(save_length[len][0], save_length[len][1], 
+          save_values[len][0],save_values[len][1],x)          
+        length_number.innerHTML =pipelength.toFixed(2) + " ";
+      }
+      else
+      {
+        length_number.innerHTML = "unknown" + " ";
+      }
+    }
+  }
+}
 //alert when tick the depth point button
 depthbtn.addEventListener('change',function(){
 
@@ -954,6 +1007,7 @@ addbtn.addEventListener("click", function(){
 canvasElem.addEventListener('mousemove', function(event) {
 
   const x = event.offsetX / scale;
+  const y = event.offsetY / scale;
   ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
   redraw()
   if (depthbtn.checked == true)
@@ -972,6 +1026,11 @@ canvasElem.addEventListener('mousemove', function(event) {
   }
 
   transf()
+
+  if(maxdepth2.length == 2)
+  {
+    display_value(x,y)
+  }
 });
 
 // get coordinate of x,y when click in the canvas, and what ever happen in the canvas. will be run in here

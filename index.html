@@ -62,6 +62,7 @@
             </ul>
         </div>
         <h1 style="margin: 10px;"></h1>
+        
         <div id="canvas-wrapper">
             <canvas class ="main canvas-container", width="1980", height="1500", id="myCanvas"></canvas>
         </div>
@@ -71,7 +72,16 @@
         <div class="zoom-icon" id="zoom-in">+</div>
         <div class="zoom-icon" id="zoom-out">-</div>
     </div>
-    
+
+    <div class="sticky_point_length">
+        <ol style="list-style: none; display: flex;">
+            <li class="text"><label for="depth_number"> Depth: </label> </li>
+            <li class ="text2" id="depth_number">unknown</li>
+            <li style="padding-left: 10px;" class="text"><label for="length_number">length: </label> </li>
+            <li class ="text2" id="length_number">unknown</li>
+        </ol>
+    </div>
+
     <script>
         // Disable pinch-to-zoom on mobile devices
         document.addEventListener('gesturestart', function(e) {

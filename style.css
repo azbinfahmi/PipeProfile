@@ -45,7 +45,6 @@ html
     overflow-y: scroll;
     width: 100%;
     height:95vh;
-
 }
 .tick
 {
@@ -207,3 +206,24 @@ footer p
     background-color: #000;
     color: #fff;
   }
+
+.sticky_point_length
+{
+    background-color: transparent;
+    position: fixed;
+    top: 89vh;
+    right: 32px;
+
+}
+
+.text
+{
+    font-family: 'Courier New', Courier, monospace;
+    opacity: 0.8;
+}
+
+.text2
+{
+    font-family: "Helvetica Neue", sans-serif;
+    opacity: 0.8;
+}
