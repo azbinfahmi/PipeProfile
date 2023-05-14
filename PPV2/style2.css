@@ -11,8 +11,8 @@
 {
     /* display: none; */
     position: fixed;
-    top: 15px;
-    right: 5px;
+    top: 60px;
+    right: 10px;
     width: max-content;
     background-color: rgb(150, 185, 215, 0.5);
     border: 2px solid rgb(0, 0, 0);
@@ -20,7 +20,6 @@
 #navbar
 {
     list-style: none;
-    display: none; 
     margin: 0;
     padding: 10px;
 }
@@ -121,4 +120,16 @@ td
     text-align: center;
     border: 2px solid black;
     
+}
+footer 
+{
+    position: absolute;
+    text-align: center;
+    bottom: 0;
+}
+  
+footer p 
+{
+    font-size: 14px;
+    color: #666;
 }

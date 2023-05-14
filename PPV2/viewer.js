@@ -217,71 +217,85 @@ function reverse_level()
 
 }
 
- function pixel(a, b)
- {
-  var newboi =[]
-  value_xcoord = 5
-  value_ycoord = 35
-  var X = 115
-  var Y = 35
-  min_height = Math.min(...pipe.filter(value => !isNaN(value)))
-  if (min_height > 0)
+function pixel(a, b)
+{
+var newboi =[]
+value_xcoord = 5
+value_ycoord = 35
+var X = 115
+var Y = 35
+min_height = Math.min(...pipe.filter(value => !isNaN(value)))
+if (min_height > 0)
+{
+  min_height = 0
+}
+
+else
+{
+  min_height = min_height * 35
+}
+
+for( var i = 0; i< a.length; i++)
+{
+  if( isNaN(a[i]) == true || isNaN(b[i]) == true)
   {
-    min_height = 0
+    
+  }
+  else
+  {
+    valuex = (b[i] * size) + X
+    valuey = (a[i] * value_ycoord) + Y
+    NewY = (myCanvas.height+ (min_height)) - valuey
+    newboi.push([valuex,NewY])
+  }     
+}
+
+if(d == 0)
+  {
+    color = "blue"
+    d=1
   }
 
   else
   {
-    min_height = min_height * 35
+    color = "red"
+    d =0
   }
 
-  for( var i = 0; i< a.length; i++)
+  var r = 0, k = 0, latestI = 0
+for ( var i = 0; i < newboi.length; i++)
   {
-    if( isNaN(a[i]) == true || isNaN(b[i]) == true)
+    r = r + 1
+    if( i == Math.abs( newI[k] - k))
     {
-      
+      latestI = newI[k] //41
+      k = k + 1
+      r = 1
+    }   
+    drawcircle("black", newboi[i][0], newboi[i][1], r)
+    //draw horizontal line
+    if( i != newboi.length - 1)
+    {
+        drawline(newboi[i+1][0], newboi[i+1][1], newboi[i][0], newboi[i][1], color)
     }
-    else
-    {
-      valuex = (b[i] * size) + X
-      valuey = (a[i] * value_ycoord) + Y
-      NewY = (myCanvas.height+ (min_height)) - valuey
-      newboi.push([valuex,NewY])
-    }     
   }
+return newboi
 
-  if(d == 0)
-    {
-      color = "blue"
-      d=1
-    }
+}
+//zoom to specific coordinate
+function find_coord()
+{
+  if(pipecoord.length > 0)
+  {
+    var targetX = pipecoord[0][0] ,targetY = pipecoord[0][1];
+    var container = document.getElementById("canvas-wrapper");
+    var containerX = targetX - canvasElem.offsetLeft - 300;
+    var containerY = targetY - canvasElem.offsetTop - 100;
 
-    else
-    {
-      color = "red"
-      d =0
-    }
-
-    var r = 0, k = 0, latestI = 0
-  for ( var i = 0; i < newboi.length; i++)
-    {
-      r = r + 1
-      if( i == Math.abs( newI[k] - k))
-      {
-        latestI = newI[k] //41
-        k = k + 1
-        r = 1
-      }   
-      drawcircle("black", newboi[i][0], newboi[i][1], r)
-      //draw horizontal line
-      if( i != newboi.length - 1)
-      {
-          drawline(newboi[i+1][0], newboi[i+1][1], newboi[i][0], newboi[i][1], color)
-      }
-    }
-  return newboi
-
- }
+    container.scrollLeft = containerX;
+    container.scrollTop = containerY;
+  }
+}
 
  textFileInput.addEventListener('change', () => {
   ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
@@ -324,8 +338,9 @@ function reverse_level()
     // console.log('chainage',chainage)
     drawTable()
     redraw()
-    console.log('newI',newI)
-    console.log('pipe.length',pipe.length)
+    
+    //zoom to specific coordinate
+    find_coord()
     alert( pipe_pixel.length +" points have been inserted.\n" + totalasb +' Drawing' )
   };
 });

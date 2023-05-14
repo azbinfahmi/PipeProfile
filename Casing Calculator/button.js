@@ -1,4 +1,8 @@
+const zoomInButton = document.querySelector('#zoom-in');
+const zoomOutButton = document.querySelector('#zoom-out');
+const canvas = document.getElementById('myCanvas');
 
+var scale = 1
 //change open button
 function changeImage() {
     var image = document.getElementById("myImage");
@@ -9,10 +13,10 @@ function changeImage() {
       image.src = "img/right.png";
       image.alt = "Image 1";
     }
-  }
+}
 
-  //open and off button
-  var opn = 1, l = 0, p = 0
+//open and off button
+var opn = 1, l = 0, p = 0
 const opnbtn = document.querySelector("#open")
 opnbtn.addEventListener("click", function(){
   const navbar = document.getElementById("navbar")
@@ -100,8 +104,24 @@ function key_press()
       lengthbtn.checked = false
     }
   }
-    
 
+   //zoom in and out button 187 is "+" , 189 is "-"
+   if((event.key === '+') || (event.key === '-'))
+   {
+     if(event.key === '+')
+     {
+       zoomInButton.click()
+       console.log("zom in")
+     }
+ 
+     else
+     {
+       zoomOutButton.click()
+       console.log("zom out")
+     }
+   }
+
+   
   })
 
 
@@ -112,5 +132,54 @@ function key_press()
     }
   });
 }
+
+
+// Add click event listeners to the zoom buttons
+zoomInButton.addEventListener('click', () => {
+  // Increase the scale factor by 0.1
+  scale = scale + 0.1;
+  // Clamp the scale factor to a reasonable range
+  scale = Math.max(0.1, Math.min(scale, 10));
+ console.log('scale',scale)
+  // Apply the new scale factor to the canvas
+ canvas.width = myImage.width * Scale *scale
+ canvas.height = myImage.height * Scale *scale
+ ctx.setTransform(scale, 0, 0, scale, 0, 0);
+ 
+   // console.log('canvas.width',canvas.width)
+ 
+  // Redraw the circle at the new position
+  const circleX = canvas.width / 2 / scale;
+  const circleY = canvas.height / 2 / scale;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.beginPath();
+  ctx.arc(circleX, circleY, 10, 0, Math.PI * 2);
+  ctx.fill();
+  redraw()
+ });
+ 
+ zoomOutButton.addEventListener('click', () => {
+  // Decrease the scale factor by 0.1
+  scale = scale - 0.1;
+  console.log('scale',scale)
+ 
+  // Clamp the scale factor to a reasonable range
+  scale = Math.max(0.1, Math.min(scale, 10));
+ 
+  // Apply the new scale factor to the canvas
+  canvas.width = myImage.width * Scale *scale
+ canvas.height = myImage.height * Scale *scale
+  ctx.setTransform(scale, 0, 0, scale, 0, 0);
+ 
+  // Redraw the circle at the new position
+  const circleX = canvas.width / 2 / scale;
+  const circleY = canvas.height / 2 / scale;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.beginPath();
+  ctx.arc(circleX, circleY, 10, 0, Math.PI * 2);
+  ctx.fill();
+  redraw()
+ });
+
 
 key_press()

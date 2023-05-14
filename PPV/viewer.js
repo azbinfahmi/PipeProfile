@@ -1,7 +1,6 @@
 // Retrieve the array from local storage
 var pipecoord = JSON.parse(localStorage.getItem("pipecoord"));
 var groundcoord = JSON.parse(localStorage.getItem("groundcoord"));
-var trans_pipelength = JSON.parse(localStorage.getItem("trans_pipelength")).map(Number);
 var c_width = JSON.parse(localStorage.getItem("c_width"));
 var c_height = JSON.parse(localStorage.getItem("c_height"));
 const canvasElem = document.getElementById("myCanvas");
@@ -23,6 +22,22 @@ else
     myCanvas.width =  1000;
     myCanvas.height = 700;
 }
+
+//zoom to specific coordinate
+function find_coord()
+{
+  if(groundcoord.length > 0 && pipecoord.length > 0)
+  {
+    var targetX = groundcoord[0][0] ,targetY = groundcoord[0][1];
+    var container = document.getElementById("canvas-wrapper");
+    var containerX = targetX - canvasElem.offsetLeft - 300;
+    var containerY = targetY - canvasElem.offsetTop - 100;
+
+    container.scrollLeft = containerX;
+    container.scrollTop = containerY;
+  }
+}
+find_coord()
 
 function drawcircle(color, a, b, no)
 {
@@ -88,7 +103,6 @@ function redraw()
 {
   var pipecoord = JSON.parse(localStorage.getItem("pipecoord"));
   var groundcoord = JSON.parse(localStorage.getItem("groundcoord"));
-  var trans_pipelength = JSON.parse(localStorage.getItem("trans_pipelength")).map(Number);
   var c_width = JSON.parse(localStorage.getItem("c_width"));
   var c_height = JSON.parse(localStorage.getItem("c_height"));
     //draw pipe depth
@@ -131,7 +145,6 @@ canvasElem.addEventListener('mousemove', function(event) {
 
     const x = event.offsetX;
     ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
-    console.log('pipecoord',pipecoord)
     redraw()
 })
 

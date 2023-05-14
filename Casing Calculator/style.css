@@ -23,13 +23,24 @@ html
 {
     /* display: none; */
     position: fixed;
-    top: 15px;
-    right: 5px;
+    top: 60px;
+    right: 10px;
     width: max-content;
     background-color: rgb(150, 185, 215, 0.5);
     border: 2px solid rgb(0, 0, 0);
 }
-
+footer 
+{
+    position: absolute;
+    text-align: center;
+    bottom: 0;
+}
+  
+footer p 
+{
+    font-size: 14px;
+    color: #666;
+}
 .tick
 {
    padding-top: 10px;
@@ -55,22 +66,21 @@ h1
     text-align: center;
     font-family:'Courier New', Courier, monospace;
 }
-.canvas_1
-{
-    display: flex;
-}
 
-
-.main
+canvas
 {
     background-color: rgb(201, 194, 194);
     border: 3px solid rgb(0, 0, 0);
     display: block;
-    margin-left: auto;   
-    margin-right: auto; 
-    margin-top: auto;
-    
 }
+
+#canvas-wrapper {
+    overflow-x: scroll;
+    overflow-y: scroll;
+    width: 100%;
+    height:95vh;
+}
+
 
 ul
 {
@@ -162,4 +172,31 @@ footer p
   
   .animated-button:hover::before {
     width: 100%;
+  }
+
+  .zoom-button {
+    position: absolute;
+    top: 60px;
+    left: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .zoom-icon {
+    width: 20px;
+    height: 20px;
+    background-color: #fff;
+    border: 1px solid #000;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+  }
+  
+  .zoom-icon:hover {
+    background-color: #000;
+    color: #fff;
   }

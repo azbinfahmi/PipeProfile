@@ -13,7 +13,7 @@ function changeImage() {
   }
 
   //open and off button
-var opn = 0
+var opn = 1
 opnbtn.addEventListener("click", function(){
   const navbar = document.getElementById("navbar")
   if (opn == 0)

@@ -5,12 +5,32 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style2.css">
-    <title>Live Viewer</title>
+    <link rel="stylesheet" href="navbar.css">
+    <link rel="stylesheet" href="dropdown.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+
+    <title>PipeProfile Live Viewer</title>
 </head>
 <body>
+    <div class="topnav">
+        <a href="../index.html">PipeProfile Calculator</a>
+        <a class="active" href="#">PipeProfile Live Viewer</a>
+        <a href="../PPV2/viewer.html">PipeProfile Viewer</a>
+        <a href="../Casing Calculator/index.html">Casing Calculator</a>
+        <div class="top-right dropdown">
+          <button class="dropbtn">Contact</button>
+          <div class="dropdown-content">
+            <a href="discord://open.dm/azbin.faizal#2084" target="_blank"><i class="fab fa-discord"></i> Discord</a>
+            <a href="mailto:azbin.faizal@echobroadband.com.my" target="_blank"><i class="fa fa-envelope"></i> Email </a>
+          </div>
+        </div>
+    </div>
+    <div style="padding: 2px;">
+
+    </div>
     <div class="sticky">
         <button id="open" onclick="changeImage()" style = "cursor: pointer;">
-            <img id="myImage" src="img/left.png" alt="Image 1">
+            <img id="myImage" src="img/right.png" alt="Image 1">
         </button>
         <ol id="navbar" style="list-style: none">
             <li class="tick"> <input type="checkbox" id="off_p"> points</li>
@@ -18,7 +38,9 @@
 
         </ol>
     </div>
-
+    <footer>
+        <p>&copy; Developed by AzbinFahmi</p>
+    </footer>
     <div id="canvas-wrapper">
         <canvas class ="main canvas-container", width="1980", height="700", id="myCanvas"></canvas>
     </div>

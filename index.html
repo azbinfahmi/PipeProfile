@@ -5,13 +5,32 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="navbar.css">
+    <link rel="stylesheet" href="dropdown.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
     <title>Pipe Profile Calculator</title>
 </head>
 <body>
-   
+    <div class="topnav">
+        <a class="active" href="#">PipeProfile Calculator</a>
+        <a href="PPV/viewer.html">PipeProfile Live Viewer</a>
+        <a href="PPV2/viewer.html">PipeProfile Viewer</a>
+        <a href="Casing Calculator/index.html">Casing Calculator</a>
+        <div class="top-right dropdown">
+          <button class="dropbtn">Contact</button>
+          <div class="dropdown-content">
+            <a href="discord://open.dm/azbin.faizal#2084" target="_blank"><i class="fab fa-discord"></i> Discord</a>
+            <a href="mailto:azbin.faizal@echobroadband.com.my" target="_blank"><i class="fa fa-envelope"></i> Email </a>
+          </div>
+        </div>
+      </div>
+    <div style="padding: 2px;">
+
+    </div>
+   </navbar>
     <div class="sticky">
         <button id="open" onclick="changeImage()" style = "cursor: pointer;">
-            <img id="myImage" src="img/left.png" alt="Image 1">
+            <img id="myImage" src="img/right.png" alt="Image 1">
         </button>
         <ol id="navbar">
             <button style = "cursor: pointer;" id="undo"> Undo</button>
@@ -21,6 +40,8 @@
             <li class="tick"> <input type="checkbox" id="L_helper"> Line to point Assist</li> 
         </ol>
     </div>
+
+
     <div class="canvas_1" id="canvas_1">
         <div class="profile">
             <ul>
@@ -51,12 +72,11 @@
                 <ol style="display: block; list-style: none; padding: 3%;">
                     <li><button class="animated-button" id="bt" onclick="saveFile()"> Generate Report</button></li>
                     <br>
-                    <li> <a href="PPV/viewer.html" target="_blank"> PipeProfile Live Viewer</a></li>
-                    <li> <a href="PPV2/viewer.html" target="_blank"> PipeProfile Viewer</a></li>
+                    <li><button class="animated-button del" id="del_data"> Delete Data</button></li>
                 </ol>
                 
                 <footer>
-                    <p>&copy; 2023 Pipe Profile Calculator (Beta v1.8.2)</p>
+                    <p>&copy; 2023 Pipe Profile Calculator (v2.0)</p>
                     <p> Developed by AzbinFahmi</p>
                 </footer>
             </ul>

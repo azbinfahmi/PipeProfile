@@ -1,7 +1,7 @@
 
 var data =[], coordX = [], coordY= [], point=[], save_length=[], arr_valueFirst=[], save_values=[], save_length_y=[];
 var length = 0, mark = 0, valueFirst=0, valueSecond =0, pipelength = 0, shortcut = 0
-var m_length =[], Scale = 1, img_det =[], check = 0
+var m_length =[], Scale = 1, img_det =[], check = 0, scale = 1
 var id =[], length=[], actual_length =[]
 const canvasElem = document.getElementById("myCanvas");
 const ctx = canvasElem.getContext('2d');
@@ -10,12 +10,20 @@ const pointbtn = document.querySelector("#Points");
 const lengthbtn = document.querySelector("#length");
 const undobtn = document.querySelector("#undo");
 const textFileInput  = document.getElementById('textInput');
-
 pointbtn.checked = true
+
+canvasElem.width = window.innerWidth;
+canvasElem.height = window.innerHeight;
+
+window.addEventListener("resize", function() {
+  canvasElem.width = window.innerWidth;
+  canvasElem.height = window.innerHeight;
+});
 
 function Load_Image()
 {
   let imgInput = document.getElementById('imageInput');
+  scale = 1
   imgInput.addEventListener('change', function(e) {
     const reader = new FileReader();
     if(e.target.files )
@@ -45,9 +53,10 @@ function Load_Image()
 }
 
 function printMousePos(canvas, event) {
-  let rect = canvas.getBoundingClientRect();
-  let x = event.clientX - rect.left;
-  let y = event.clientY - rect.top;
+  let x = event.offsetX;
+  let y = event.offsetY;
+  x = x / scale
+  y = y / scale
   console.log("Coordinate x: " + x, "Coordinate y: " + y);
   coordX.push(x)
   coordY.push(y)
@@ -58,8 +67,17 @@ function drawcircle(color, a, b, no)
   //draw circle
   var c = document.getElementById("myCanvas")
   var ctx = c.getContext("2d");
+  if(scale > 1)
+  {
+    radius = 4 / scale
+  }
+
+  else
+  {
+    radius = 4 * scale
+  }
   ctx.beginPath();
-  ctx.arc(a, b, 4, 0, 2 * Math.PI*2);
+  ctx.arc(a, b, radius, 0, 2 * Math.PI*2);
   ctx.fillStyle =color
   ctx.fill()
   
@@ -87,10 +105,12 @@ function drawcircle(color, a, b, no)
 
 function drawConstantCircle(event)
 {
-  let rect = canvasElem.getBoundingClientRect();
   // Get mouse position
-  var mouseX = event.clientX - rect.left;
-  var mouseY = event.clientY - rect.top;
+  const x = event.offsetX;
+  const y = event.offsetY;
+
+  const circleX = x / scale;
+  const circleY = y / scale;
 
   if( pointbtn.checked == true)
   {
@@ -103,10 +123,19 @@ function drawConstantCircle(event)
   }
   
   // Draw circle at mouse position
-  radius = 4
+  if(scale > 1)
+  {
+    radius = 4 / scale
+  }
+
+  else
+  {
+    radius = 4 * scale
+  }
+
   ctx.beginPath();
   ctx.fillStyle = color
-  ctx.arc(mouseX, mouseY, radius, 0, 2 * Math.PI);
+  ctx.arc(circleX, circleY, radius, 0, 2 * Math.PI);
   ctx.fill();
 }
 
@@ -272,43 +301,7 @@ function redraw()
 
     drawline(save_length[len][0],save_length_y[len][0],save_length[len][1],save_length_y[len][1])
   }
-  
-
-  
 }
-
-// subbtn.addEventListener("click", function(){
-
-//   data.push([length, input1,input2,input3])
-
-//   console.log('data',data)
-
-//   const tableBody = document.getElementById("myTableBody");
-//   table_data = data
-  
-//     while(tableBody.firstChild)
-//     {
-//       tableBody.removeChild(tableBody.firstChild);
-//     }
-//     if(data.length > 0)
-//     {
-//       for (let i = 0; i < table_data.length; i++) 
-//       {
-//         const row = tableBody.insertRow();
-//         const cell1 = row.insertCell(-1);
-//         cell1.innerHTML = i+1;
-        
-//         for (let j = 0; j < table_data[i].length; j++) {
-//           const cell2 = row.insertCell(j+1);
-//           cell2.innerHTML = table_data[i][j];
-//         }
-//       }
-//     }
-  
-//   document.getElementById("a").value = "";
-//   document.getElementById("b").value = "";
-//   document.getElementById("c").value = "";
-// })
 
 pointbtn.addEventListener('change',function(){
   if (pointbtn.checked == true)
@@ -336,61 +329,6 @@ undobtn.addEventListener('click',function(){
   }
   point_undo()
 })
-
-textFileInput.addEventListener('change', () => {
-  ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
-  const file = textFileInput.files[0];
-  const reader = new FileReader();
-
-  reader.readAsText(file);
-
-  reader.onload = () => {
-    id =[], length=[], actual_length =[], data =[]
-    const fileContents = reader.result;
-    const lines = fileContents.split('\n');
-
-    for (let i = 1; i < lines.length; i++) { // start at i = 1 to skip header row
-      const columns = lines[i].split('\t');
-
-      if (columns.length === 3) {
-        // id.push(Number(columns[0]));
-        length.push(Number(columns[1]));
-        actual_length.push(Number(columns[2]));
-      }
-    }
-    
-    for( var i = 0; i < actual_length.length; i++)
-    {
-      data.push([length[i], actual_length[i]])
-    }
-    const tableBody = document.getElementById("myTableBody");
-    table_data = data
-    
-    while(tableBody.firstChild)
-    {
-      tableBody.removeChild(tableBody.firstChild);
-    }
-
-    if(data.length > 0)
-    {
-      for (let i = 0; i < table_data.length; i++) 
-      {
-        const row = tableBody.insertRow();
-        const cell1 = row.insertCell(-1);
-        cell1.innerHTML = i+1;
-        
-        for (let j = 0; j < table_data[i].length; j++) {
-          const cell2 = row.insertCell(j+1);
-          cell2.innerHTML = table_data[i][j];
-        }
-      }
-    }
-
-    alert( actual_length.length +" points have been inserted." )
-    redraw()
-  };
-});
-
 
 canvasElem.addEventListener('mousemove', function(event) {
   const x = event.offsetX;

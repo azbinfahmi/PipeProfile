@@ -2,10 +2,10 @@ var coordX = [], coordY= [], Xaxis =[], Yaxis=[], maxdepth2=[], pipelevel=[],
 groundlevel=[], data=[],pipecoord=[],groundcoord=[],lenx=[],leny=[], save_length=[], save_values=[];
 //for undo button
 var undoDepth =[]
-var total_depth, total_pixel,calc, trans_pipecoord =[], trans_groundcoord =[], trans_pipelength =[];
+var total_depth, total_pixel,calc;
 var arr_valueFirst =[], arr_valueSecond =[], valueFirst=0, valueSecond=0, checking = 0
 var pipelength = 0, mark1 = 0, mark2 = 0, markclone1 =0, markclone2 = 0,  shortcut = 0;
-var myImage, Scale
+var myImage, Scale, scale = 1
 var edit_row = -1, del = -1,c_width=0, c_height =0, edit_what = 0
 
 const imgInput = document.getElementById('imageInput');
@@ -18,6 +18,7 @@ const LHbtn = document.querySelector("#L_helper")
 const editbtn = document.querySelector("#edit")
 const delbtn = document.querySelector("#delete")
 const addbtn = document.querySelector("#add")
+const del_databtn = document.querySelector("#del_data")
 const canvasElem = document.getElementById("myCanvas");
 const ctx = canvasElem.getContext('2d');
 const depth_number= document.querySelector("#depth_number")
@@ -26,16 +27,104 @@ depthbtn.checked = true;
 HHbtn.checked = true;
 LHbtn.checked = true;
 
+// Retrieve the array from local storage
+var maxdepth2 = JSON.parse(localStorage.getItem("maxdepth2"));
+var pipecoord = JSON.parse(localStorage.getItem("pipecoord"));
+var groundcoord = JSON.parse(localStorage.getItem("groundcoord"));
+var data = JSON.parse(localStorage.getItem("data"));
+
+if(maxdepth2.length == 2)
+{
+  pointbtn.checked = true
+}
+var mark1 = JSON.parse(localStorage.getItem("mark1"));
+var mark2 = JSON.parse(localStorage.getItem("mark2"));
+var arr_valueFirst = JSON.parse(localStorage.getItem("arr_valueFirst"));
+var arr_valueSecond = JSON.parse(localStorage.getItem("arr_valueSecond"));
+var save_length = JSON.parse(localStorage.getItem("save_length"));
+var save_values = JSON.parse(localStorage.getItem("save_values"));
+
+var total_depth = JSON.parse(localStorage.getItem("total_depth"));
+var calc = JSON.parse(localStorage.getItem("calc"));
+c_height = JSON.parse(localStorage.getItem("c_height"));
+c_width = JSON.parse(localStorage.getItem("c_width"));
+
+if (maxdepth2 == null || maxdepth2 == undefined || maxdepth2.length < 2)
+{
+  pipecoord =[], groundcoord=[], data=[], maxdepth2 =[], mark1=0, mark2=0
+  arr_valueFirst=[],arr_valueSecond=[], save_length =[], save_values =[]
+  total_depth = 0, calc = 0
+}
+
+if(c_height != 0)
+{
+  canvasElem.height = c_height
+  canvasElem.width = c_width
+}
+redraw()
+find_coord()
+//retrieve data
+function transf()
+{
+  //save pipelength, ground coord and pipe coord to insert into another html
+  //for depth point
+  localStorage.setItem("mark1", JSON.stringify(mark1));
+  localStorage.setItem("mark2", JSON.stringify(mark2));
+  localStorage.setItem("total_depth", JSON.stringify(total_depth));
+  localStorage.setItem("calc", JSON.stringify(calc));
+
+  
+  localStorage.setItem("maxdepth2", JSON.stringify(maxdepth2));
+  localStorage.setItem("pipecoord", JSON.stringify(pipecoord));
+  localStorage.setItem("groundcoord", JSON.stringify(groundcoord));
+  localStorage.setItem("data", JSON.stringify(data));
+  
+  //length axis
+  localStorage.setItem("arr_valueFirst", JSON.stringify(arr_valueFirst));
+  localStorage.setItem("arr_valueSecond", JSON.stringify(arr_valueSecond));
+  localStorage.setItem("save_length", JSON.stringify(save_length));
+  localStorage.setItem("save_values", JSON.stringify(save_values));
+
+  //canvas width and height
+  localStorage.setItem("c_height", JSON.stringify(c_height));
+  localStorage.setItem("c_width", JSON.stringify(c_width));
+}
+
+//zoom to specific coordinate
+function find_coord()
+{
+  if(groundcoord.length > 0 && pipecoord.length > 0)
+  {
+    var targetX = groundcoord[0][0] ,targetY = groundcoord[0][1];
+    var container = document.getElementById("canvas-wrapper");
+    var containerX = targetX - canvasElem.offsetLeft - 300;
+    var containerY = targetY - canvasElem.offsetTop - 100;
+
+    container.scrollLeft = containerX;
+    container.scrollTop = containerY;
+  }
+
+  else if ( maxdepth2.length == 0)
+  {
+    var targetX = 0 ,targetY = 0;
+    var container = document.getElementById("canvas-wrapper");
+    var containerX = targetX - canvasElem.offsetLeft - 300;
+    var containerY = targetY - canvasElem.offsetTop - 100;
+
+    container.scrollLeft = containerX;
+    container.scrollTop = containerY;
+  }
+
+}
 
 //Load and display the image into canvas
 function Load_Image()
 {
-  
   imgInput.addEventListener('change', function(e) {
     scale = 1 // ni untuk scale zoom in/out
     const reader = new FileReader();
     if(e.target.files )
-    {
+    {      
       Scale = (prompt("Add a scale to the image","1"))
       if (Scale == 0)
       {
@@ -67,7 +156,8 @@ function Load_Image()
       c_width = myCanvas.width
     }
   });
-
+  ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
+  redraw()
 }
 
 //get coordinate when click
@@ -232,10 +322,13 @@ function drawline(x1,y1,x2,y2)
 //draw vertical line
 function drawLine(x) {
   // Draw the line
-
+  
   if(myImage == undefined)
   {
-
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, myCanvas.height);
+    ctx.stroke();
   }
 
   else
@@ -379,19 +472,6 @@ function depth_undo()
     lengthbtn.checked = false
     //delete last point of the array
     maxdepth2.pop()
-    if (maxdepth2.length == 1)
-    {
-      drawcircle("black", maxdepth2[0][1], maxdepth2[0][2], 0)
-    }
-  }
-
-  else 
-  {
-    drawline(maxdepth2[0][1], maxdepth2[0][2], maxdepth2[1][1], maxdepth2[1][2])
-    for (var i= 0; i < total_depth + 1 ; i++ )
-    {
-      drawcircle("black", maxdepth2[0][1], maxdepth2[0][2] + (calc * i), 0 ,i)
-    }
   }
 }
 //undo for point
@@ -445,42 +525,6 @@ function point_undo()
         }
       }
     }
-  }
-  
-  for (var i = 0; i < groundcoord.length; i ++)
-  {
-    drawcircle("blue", groundcoord[i][0], groundcoord[i][1], i +1 )
-    if (i!= groundcoord.length - 1)
-    {
-      drawline(groundcoord[i+1][0], groundcoord[i+1][1], groundcoord[i][0], groundcoord[i][1])
-    }
-  }
-
-  for ( var i = 0; i < pipecoord.length; i++)
-  {
-    drawcircle("yellow", pipecoord[i][0], pipecoord[i][1], i +1)
-    //draw horizontal line
-    if( i != pipecoord.length - 1)
-    {
-      drawline(pipecoord[i+1][0], pipecoord[i+1][1], pipecoord[i][0], pipecoord[i][1])
-
-    }
-    drawline(pipecoord[i][0], 0, pipecoord[i][0], canvasElem.height )
-  }
-
-  //check if point can be calculated
-  if (save_values.length > 0 && pipecoord.length > 0)
-  {
-    
-    if((pipecoord[pipecoord.length-1][0] > save_length[save_length.length-1][0]) && (pipecoord[pipecoord.length-1][0] < save_length[save_length.length-1][1]))
-    {
-      if(mark1!= mark2)
-      {
-        drawcircle("green",pipecoord[pipecoord.length-1][0],pipecoord[pipecoord.length-1][1], mark1)
-      }
-      //this variable is used in calculate length
-      shortcut = 1
-    }        
   }
 }
 
@@ -661,23 +705,6 @@ function redraw()
   }
 }
 
-//retrieve data
-function transf()
-{
-  //save pipelength, ground coord and pipe coord to insert into another html
-  trans_pipelength =[]
-  for(var i = 0; i < data.length; i++)
-  {
-    trans_pipelength.push(data[i][2])
-  }
-
-  localStorage.setItem("trans_pipelength", JSON.stringify(trans_pipelength));
-  localStorage.setItem("pipecoord", JSON.stringify(pipecoord));
-  localStorage.setItem("groundcoord", JSON.stringify(groundcoord));
-  localStorage.setItem("c_height", JSON.stringify(c_height));
-  localStorage.setItem("c_width", JSON.stringify(c_width));
-}
-
 //display depth and length
 function display_value(x,y)
 {
@@ -790,7 +817,7 @@ undobtn.addEventListener("click", function(){
 
   var canvas = document.getElementById('myCanvas');
   var ctx = canvas.getContext('2d');
-  // clear the specific arc
+  // clear the canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // redraw Image
@@ -804,11 +831,9 @@ undobtn.addEventListener("click", function(){
     alert("Nothing to undo")
   }
 
-  depth_undo()
-
   //undo point
+  depth_undo()
   point_undo()
-
   redraw()
 });
 
@@ -1003,6 +1028,32 @@ addbtn.addEventListener("click", function(){
 
 })
 
+
+del_databtn.addEventListener("click", function(){
+pipecoord = []
+groundcoord = []
+data = []
+maxdepth2 = []
+mark1 = 0
+mark2 = 0
+arr_valueFirst = []
+arr_valueSecond = []
+save_length = []
+save_values = []
+total_depth = 0
+c_height = 0
+c_width = 0
+canvasElem.width = 1980
+canvasElem.height = 1500
+pointbtn.checked = false
+lengthbtn.checked = false
+redraw()
+find_coord()
+
+location.reload();
+
+})
+
 //make vertical line
 canvasElem.addEventListener('mousemove', function(event) {
 
@@ -1071,6 +1122,7 @@ canvasElem.addEventListener("mousedown", function(e)
           total_depth = maxdepth2[0][0] - maxdepth2[1][0]
           total_pixel = maxdepth2[1][2] - maxdepth2[0][2]
           calc = total_pixel / total_depth
+          console.log('calc',calc)
           // console.log(maxdepth2)
           if(depth != null)
           {
@@ -1213,7 +1265,6 @@ canvasElem.addEventListener("mousedown", function(e)
       }
 
     }
-
     else
     {
       if (mark1 == mark2)
@@ -1366,7 +1417,6 @@ canvasElem.addEventListener("mousedown", function(e)
   //find length based on last point
   if (lengthbtn.checked == true)
   {
-
     getcoord = coordX.length -1
     //calculate pipe length value automatically
     if (coordY[getcoord] > 0)

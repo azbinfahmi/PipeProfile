@@ -3,7 +3,7 @@ const zoomOutButton = document.querySelector('#zoom-out');
 const canvas = document.getElementById('myCanvas');
 const opnbtn = document.querySelector("#open")
 
-let scale = 1
+var scale = 1
 
 //change open button
 function changeImage() {
@@ -18,7 +18,7 @@ function changeImage() {
   }
 
   //open and off button
-var opn = 0, l = 0, p = 0
+var opn = 1, l = 0, p = 0
 opnbtn.addEventListener("click", function(){
   const navbar = document.getElementById("navbar")
   if (opn == 0)
