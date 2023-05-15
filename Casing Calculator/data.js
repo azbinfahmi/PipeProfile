@@ -15,11 +15,6 @@ pointbtn.checked = true
 canvasElem.width = window.innerWidth;
 canvasElem.height = window.innerHeight;
 
-window.addEventListener("resize", function() {
-  canvasElem.width = window.innerWidth;
-  canvasElem.height = window.innerHeight;
-});
-
 function Load_Image()
 {
   let imgInput = document.getElementById('imageInput');
@@ -267,6 +262,8 @@ function redraw()
   
   if (Scale > 0)
   {
+    // myCanvas.width = myImage.width*Scale ; // Assigns image's width to canvas
+    // myCanvas.height = myImage.height*Scale;
     ctx.drawImage(myImage,0,0, myImage.width *Scale, myImage.height *Scale);
   }
 
@@ -331,7 +328,8 @@ undobtn.addEventListener('click',function(){
 })
 
 canvasElem.addEventListener('mousemove', function(event) {
-  const x = event.offsetX;
+  const x = event.offsetX / scale;
+  const y = event.offsetY / scale;
   ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
   redraw()
   drawConstantCircle(event)
