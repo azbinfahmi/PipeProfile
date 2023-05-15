@@ -7,7 +7,7 @@ var arr_valueFirst =[], arr_valueSecond =[], valueFirst=0, valueSecond=0, checki
 var pipelength = 0, mark1 = 0, mark2 = 0, markclone1 =0, markclone2 = 0,  shortcut = 0;
 var myImage, Scale, scale = 1
 var edit_row = -1, del = -1,c_width=0, c_height =0, edit_what = 0
-
+var x, y
 const imgInput = document.getElementById('imageInput');
 const undobtn = document.querySelector("#undo");
 const lengthbtn = document.querySelector("#length");
@@ -65,6 +65,7 @@ if(c_height != 0)
 }
 redraw()
 find_coord()
+
 //retrieve data
 function transf()
 {
@@ -117,6 +118,18 @@ function find_coord()
     container.scrollTop = containerY;
   }
 
+}
+
+//zoom to specific coordinate when clear all data
+function find_coord_clear()
+{
+  var targetX = x ,targetY = y;
+  var container = document.getElementById("canvas-wrapper");
+  var containerX = targetX - canvasElem.offsetLeft - 300;
+  var containerY = targetY - canvasElem.offsetTop - 100;
+
+  container.scrollLeft = containerX;
+  container.scrollTop = containerY;
 }
 
 //Load and display the image into canvas
@@ -748,6 +761,273 @@ function display_value(x,y)
     }
   }
 }
+
+//copy previous pipe or ground value
+function copy_previous()
+{
+  if (pipecoord.length> 0)
+  {
+    if (mark1 == mark2)
+    {  
+      mark1 =mark1+1
+      var len = pipecoord.length - 1
+      pipecoord.push([x, pipecoord[len][1]])
+      drawcircle("yellow", x, pipecoord[len][1], mark1)
+      // console.log('pipelevel',pipelevel)
+      
+      //draw line from previous point to current point 
+      if(pipecoord.length > 1)
+      {
+        drawline(pipecoord[mark1-2][0], pipecoord[mark1-2][1], pipecoord[mark1-1][0], pipecoord[mark1-1][1])
+      }
+      //draw horizontal line
+      drawline(pipecoord[mark1-1][0], 0, pipecoord[mark1-1][0], canvasElem.height )
+
+      if (save_values.length > 0)
+      {
+        if(save_length[save_length.length-1][0] < save_length[save_length.length-1][1] )
+        {
+          if((pipecoord[pipecoord.length-1][0] > save_length[save_length.length-1][0]) && (pipecoord[pipecoord.length-1][0] < save_length[save_length.length-1][1]))
+          {
+            if(mark1!= mark2)
+            {
+              drawcircle("green",pipecoord[pipecoord.length-1][0],pipecoord[pipecoord.length-1][1], 0.5)
+              len = save_values.length - 1
+              pipelength = calc_length(save_length[len][0], save_length[len][1], 
+                save_values[len][0],save_values[len][1])
+              // alert('pipe length value for current point is '+ pipelength.toFixed(2))
+              shortcut = 1
+            }            
+          }
+        }
+
+        else if (save_length[save_length.length-1][0] > save_length[save_length.length-1][1] )
+        {
+          if((pipecoord[pipecoord.length-1][0] > save_length[save_length.length-1][1]) && (pipecoord[pipecoord.length-1][0] < save_length[save_length.length-1][0]))
+          {
+            if(mark1!= mark2)
+            {
+              drawcircle("green",pipecoord[pipecoord.length-1][0],pipecoord[pipecoord.length-1][1], 0.5)
+              len = save_values.length - 1
+              pipelength = calc_length(save_length[len][0], save_length[len][1], 
+                save_values[len][0],save_values[len][1])
+              // alert('pipe length value for current point is '+ pipelength.toFixed(2))
+              shortcut = 1
+            }            
+          }
+        }        
+      }
+    }
+    
+    else
+    {
+      var p = 0, len_g = groundcoord.length - 1, len_p = pipecoord.length - 1
+      mark2 =mark2+1
+      groundlevel=[]
+      combine=[]
+      groundcoord.push([pipecoord[len_p][0], groundcoord[len_g][1]])
+      drawcircle("blue", pipecoord[len_p][0], groundcoord[len_g][1], mark2)
+      drawcircle("yellow",pipecoord[pipecoord.length-1][0],pipecoord[pipecoord.length-1][1], 0.5)
+      groundlevel.push(level(groundcoord[len_g][1]))
+      
+      if (pipelength == 0 && shortcut == 0)
+      {
+        var p = prompt("Insert pipe length value")
+        if(p == undefined)
+        {
+          mark2 = mark2 - 1
+          groundcoord.pop()
+        }
+
+        else
+        {
+          pipelength = p
+        }
+      }
+
+      else
+      {
+        len = save_values.length - 1
+        pipelength = calc_length(save_length[len][0], save_length[len][1], 
+          save_values[len][0],save_values[len][1])
+        shortcut = 0
+      }
+
+      if( p != undefined || p!=null)
+      {
+        pipelevel.push(level(pipecoord[mark1 - 1][1]))
+        //console.log('pipelevel',pipelevel)
+        var combine =pipelevel.concat(groundlevel)
+        data.push([combine[0],combine[1], Number(pipelength)])
+        // console.log('data:',data)
+
+        //draw line for each point
+        if(groundcoord.length > 1)
+        {
+          drawline(groundcoord[mark1-2][0], groundcoord[mark1-2][1], groundcoord[mark1-1][0], groundcoord[mark1-1][1])
+        }
+
+        //create table and insert data
+        const tableBody = document.getElementById("myTableBody");
+        table_data = data
+
+        // Start removing from the last row to the first one
+        while(tableBody.firstChild)
+        {
+          tableBody.removeChild(tableBody.firstChild);
+        }
+        for (let i = 0; i < table_data.length; i++) 
+        {
+          const row = tableBody.insertRow();
+          const cell1 = row.insertCell(0);
+          cell1.innerHTML = i+1;
+          
+          for (let j = 0; j < table_data[i].length; j++) {
+            const cell2 = row.insertCell(j+1);
+            num = Math.round(table_data[i][j] * 100) / 100
+            cell2.innerHTML = num.toFixed(2);
+          }
+        }
+      }
+      pipelength = 0, pipelevel=[]
+    }
+  }
+}
+
+//copy previous pipe or ground value with their length
+function copy_previous_spot()
+{
+  if (pipecoord.length> 0)
+  {
+
+    if(mark1 == mark2)
+    {
+      mark1 =mark1+1
+      var len = pipecoord.length - 1
+      pipecoord.push([pipecoord[len][0], pipecoord[len][1]])
+      drawcircle("yellow", [pipecoord[len][0], pipecoord[len][1]], mark1)
+      // console.log('pipelevel',pipelevel)
+      
+      //draw line from previous point to current point 
+      if(pipecoord.length > 1)
+      {
+        drawline(pipecoord[mark1-2][0], pipecoord[mark1-2][1], pipecoord[mark1-1][0], pipecoord[mark1-1][1])
+      }
+      //draw horizontal line
+      drawline(pipecoord[mark1-1][0], 0, pipecoord[mark1-1][0], canvasElem.height )
+
+      if (save_values.length > 0)
+      {
+        if(save_length[save_length.length-1][0] < save_length[save_length.length-1][1] )
+        {
+          if((pipecoord[pipecoord.length-1][0] > save_length[save_length.length-1][0]) && (pipecoord[pipecoord.length-1][0] < save_length[save_length.length-1][1]))
+          {
+            if(mark1!= mark2)
+            {
+              drawcircle("green",pipecoord[pipecoord.length-1][0],pipecoord[pipecoord.length-1][1], 0.5)
+              len = save_values.length - 1
+              pipelength = calc_length(save_length[len][0], save_length[len][1], 
+                save_values[len][0],save_values[len][1])
+              // alert('pipe length value for current point is '+ pipelength.toFixed(2))
+              shortcut = 1
+            }            
+          }
+        }
+
+        else if (save_length[save_length.length-1][0] > save_length[save_length.length-1][1] )
+        {
+          if((pipecoord[pipecoord.length-1][0] > save_length[save_length.length-1][1]) && (pipecoord[pipecoord.length-1][0] < save_length[save_length.length-1][0]))
+          {
+            if(mark1!= mark2)
+            {
+              drawcircle("green",pipecoord[pipecoord.length-1][0],pipecoord[pipecoord.length-1][1], 0.5)
+              len = save_values.length - 1
+              pipelength = calc_length(save_length[len][0], save_length[len][1], 
+                save_values[len][0],save_values[len][1])
+              // alert('pipe length value for current point is '+ pipelength.toFixed(2))
+              shortcut = 1
+            }            
+          }
+        }        
+      }
+    }
+
+    else
+    {
+      var p = 0, len_g = groundcoord.length - 1, len_p = pipecoord.length - 1
+      mark2 =mark2+1
+      groundlevel=[]
+      combine=[]
+      groundcoord.push([pipecoord[len_p][0], groundcoord[len_g][1]])
+      drawcircle("blue", pipecoord[len_p][0], groundcoord[len_g][1], mark2)
+      drawcircle("yellow",pipecoord[pipecoord.length-1][0],pipecoord[pipecoord.length-1][1], 0.5)
+      groundlevel.push(level(groundcoord[len_g][1]))
+      
+      if (pipelength == 0 && shortcut == 0)
+      {
+        var p = prompt("Insert pipe length value")
+        if(p == undefined)
+        {
+          mark2 = mark2 - 1
+          groundcoord.pop()
+        }
+
+        else
+        {
+          pipelength = p
+        }
+      }
+
+      else
+      {
+        len = save_values.length - 1
+        pipelength = calc_length(save_length[len][0], save_length[len][1], 
+          save_values[len][0],save_values[len][1])
+        shortcut = 0
+      }
+
+      if( p != undefined || p!=null)
+      {
+        pipelevel.push(level(pipecoord[mark1 - 1][1]))
+        //console.log('pipelevel',pipelevel)
+        var combine =pipelevel.concat(groundlevel)
+        data.push([combine[0],combine[1], Number(pipelength)])
+        // console.log('data:',data)
+
+        //draw line for each point
+        if(groundcoord.length > 1)
+        {
+          drawline(groundcoord[mark1-2][0], groundcoord[mark1-2][1], groundcoord[mark1-1][0], groundcoord[mark1-1][1])
+        }
+
+        //create table and insert data
+        const tableBody = document.getElementById("myTableBody");
+        table_data = data
+
+        // Start removing from the last row to the first one
+        while(tableBody.firstChild)
+        {
+          tableBody.removeChild(tableBody.firstChild);
+        }
+        for (let i = 0; i < table_data.length; i++) 
+        {
+          const row = tableBody.insertRow();
+          const cell1 = row.insertCell(0);
+          cell1.innerHTML = i+1;
+          
+          for (let j = 0; j < table_data[i].length; j++) {
+            const cell2 = row.insertCell(j+1);
+            num = Math.round(table_data[i][j] * 100) / 100
+            cell2.innerHTML = num.toFixed(2);
+          }
+        }
+      }
+      pipelength = 0, pipelevel=[]
+    }
+
+  }
+}
+
 //alert when tick the depth point button
 depthbtn.addEventListener('change',function(){
 
@@ -1032,6 +1312,14 @@ addbtn.addEventListener("click", function(){
 
 
 del_databtn.addEventListener("click", function(){
+ coordX = [], coordY= [], Xaxis =[], Yaxis=[], maxdepth2=[], pipelevel=[], 
+groundlevel=[], data=[],pipecoord=[],groundcoord=[],lenx=[],leny=[], save_length=[], save_values=[];
+//for undo button
+undoDepth =[]
+total_depth, total_pixel,calc;
+arr_valueFirst =[], arr_valueSecond =[], valueFirst=0, valueSecond=0, checking = 0
+pipelength = 0, mark1 = 0, mark2 = 0, markclone1 =0, markclone2 = 0,  shortcut = 0;
+edit_row = -1, del = -1,c_width=0, c_height =0, edit_what = 0
 pipecoord = []
 groundcoord = []
 data = []
@@ -1045,22 +1333,18 @@ save_values = []
 total_depth = 0
 c_height = 0
 c_width = 0
-canvasElem.width = 1980
-canvasElem.height = 1500
 pointbtn.checked = false
 lengthbtn.checked = false
 redraw()
-find_coord()
-
-location.reload();
-
+find_coord_clear()
 })
 
 //make vertical line
 canvasElem.addEventListener('mousemove', function(event) {
 
-  const x = event.offsetX / scale;
-  const y = event.offsetY / scale;
+  x = event.offsetX / scale;
+  y = event.offsetY / scale;
+
   ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
   redraw()
   if (depthbtn.checked == true)
@@ -1285,7 +1569,6 @@ canvasElem.addEventListener("mousedown", function(e)
           {
             drawline(pipecoord[mark1-2][0], pipecoord[mark1-2][1], pipecoord[mark1-1][0], pipecoord[mark1-1][1])
           }
-
           //draw horizontal line
           drawline(pipecoord[mark1-1][0], 0, pipecoord[mark1-1][0], canvasElem.height )
         }

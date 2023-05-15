@@ -75,6 +75,21 @@ function key_press()
     delbtn.click()
   }
 
+  //copy previous pipecoord or groundcoord
+  if(event.key === '?' && isShiftDown)
+  {
+    console.log('x', x)
+    copy_previous()
+    console.log('pipecoord',pipecoord, mark1, mark2)
+  }
+
+  //copy previous pipecoord with same length
+  if((event.key === '>' && isShiftDown) || (event.which === 2))
+  {
+    console.log('>')
+    copy_previous_spot()
+  }
+
 
   //zoom in and out button 187 is "+" , 189 is "-"
   if((event.key === '+') || (event.key === '-'))
