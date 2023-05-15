@@ -33,10 +33,6 @@ var pipecoord = JSON.parse(localStorage.getItem("pipecoord"));
 var groundcoord = JSON.parse(localStorage.getItem("groundcoord"));
 var data = JSON.parse(localStorage.getItem("data"));
 
-if(maxdepth2.length == 2)
-{
-  pointbtn.checked = true
-}
 var mark1 = JSON.parse(localStorage.getItem("mark1"));
 var mark2 = JSON.parse(localStorage.getItem("mark2"));
 var arr_valueFirst = JSON.parse(localStorage.getItem("arr_valueFirst"));
@@ -54,6 +50,12 @@ if (maxdepth2 == null || maxdepth2 == undefined || maxdepth2.length < 2)
   pipecoord =[], groundcoord=[], data=[], maxdepth2 =[], mark1=0, mark2=0
   arr_valueFirst=[],arr_valueSecond=[], save_length =[], save_values =[]
   total_depth = 0, calc = 0
+}
+
+
+if(maxdepth2.length == 2)
+{
+  pointbtn.checked = true
 }
 
 if(c_height != 0)
@@ -1511,6 +1513,10 @@ let saveFile = () =>
   // console.log('savedata1:\n',savedata1)
   let savedata2 ='p_level\t' + 'g_level\t' + 'length';
   const textToBLOB = new Blob([savedata2,savedata1], {type: 'text/plain'});
+  // if (imgInput.files[0].name == null || imgInput.files[0].name == undefined)
+  // {
+  //   imgInput.files[0].name = ""
+  // }
   const sFileName = prompt("Insert file name?", imgInput.files[0].name) + ".txt"
   if(sFileName != null)
   {
