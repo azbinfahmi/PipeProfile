@@ -1,7 +1,7 @@
 
-var data =[], coordX = [], coordY= [], point=[], save_length=[], arr_valueFirst=[], save_values=[], save_length_y=[];
+var data =[], coordX = [], coordY= [], point=[], save_length=[], arr_valueFirst=[], arr_valueSecond = [], save_values=[], save_length_y=[];
 var length = 0, mark = 0, valueFirst=0, valueSecond =0, pipelength = 0, shortcut = 0
-var m_length =[], Scale = 1, img_det =[], check = 0, scale = 1
+var m_length =[], Scale, img_det =[], check = 0, scale = 1, checking = 0
 var id =[], length=[], actual_length =[]
 const canvasElem = document.getElementById("myCanvas");
 const ctx = canvasElem.getContext('2d');
@@ -41,6 +41,8 @@ function Load_Image()
           myCanvas.width = myImage.width*Scale ; // Assigns image's width to canvas
           myCanvas.height = myImage.height*Scale; // Assigns image's height to canvas
           myContext.drawImage(myImage,0,0, myImage.width *Scale, myImage.height *Scale); // Draws the image on canvas
+
+          redraw()
         }
       }
     }
@@ -57,7 +59,7 @@ function printMousePos(canvas, event) {
   coordY.push(y)
 }
 
-function drawcircle(color, a, b, no)
+function drawcircle(color, a, b, no, i)
 {
   //draw circle
   var c = document.getElementById("myCanvas")
@@ -86,16 +88,19 @@ function drawcircle(color, a, b, no)
     ctx.fillText(name, a - 22, b-10 );
   }
 
-  // else if ( no == 0.5)
-  // {
-  //   ctx.fillStyle = "black";
-  //   ctx.font = "11px Arial";
-  //   ctx.textAlign = "center";
-  //   ctx.fillText(name, a - 22, b-10 );
-  // }
 
-  ctx.stroke();
- 
+
+  else if ( no == 0.5)
+  {
+    if (color == "purple")
+    {
+      ctx.fillStyle = "black";
+      ctx.font = "11px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText(i, a - 22, b-10 );
+    }
+    
+  }
 }
 
 function drawConstantCircle(event)
@@ -160,7 +165,7 @@ function drawline(x1,y1,x2,y2)
 
     // End point
     context.lineTo(x2, y2);
-    ctx.lineWidth = 2
+    ctx.lineWidth = 1
     // Stroke will make the line visible
     context.stroke();
 
@@ -257,6 +262,21 @@ function point_undo()
   }
 }
 
+function length_undo()
+{
+  if( checking == 1)
+  {
+    checking = 0
+    arr_valueFirst = [], arr_valueSecond=[]
+  }
+
+  else
+  {
+    save_length=[], save_values =[], arr_valueSecond=[]
+    checking = 1
+  }
+}
+
 function redraw()
 {
   
@@ -287,16 +307,15 @@ function redraw()
   if(arr_valueFirst.length > 0)
   {
     
-    drawcircle("purple", arr_valueFirst[0], arr_valueFirst[1], 0.5)
+    drawcircle("purple", arr_valueFirst[0], arr_valueFirst[1], 0.5,valueFirst)
   }
 
   if ( save_length.length > 0)
   {
     len = save_length.length - 1
-    drawcircle("purple", save_length[len][0],save_length_y[len][0],0.5)
-    drawcircle("purple", save_length[len][1],save_length_y[len][1],0.5)
-
-    drawline(save_length[len][0],save_length_y[len][0],save_length[len][1],save_length_y[len][1])
+    drawcircle("purple",arr_valueFirst[0],arr_valueFirst[1], 0.5, valueFirst)
+    drawcircle("purple",arr_valueSecond[0],arr_valueSecond[1], 0.5, valueSecond)
+    drawline(arr_valueFirst[0],arr_valueFirst[1],arr_valueSecond[0],arr_valueSecond[1])
   }
 }
 
@@ -324,7 +343,17 @@ undobtn.addEventListener('click',function(){
   {
     ctx.drawImage(myImage,0,0, myImage.width *Scale, myImage.height *Scale);
   }
-  point_undo()
+  if(lengthbtn.checked == true)
+  {
+    length_undo()
+    redraw()
+  }
+
+  else
+  {
+    point_undo()
+    redraw()
+  }
 })
 
 canvasElem.addEventListener('mousemove', function(event) {
@@ -419,57 +448,54 @@ canvasElem.addEventListener("mousedown", function(e)
     pipelength = 0
   }
 
-  if(lengthbtn.checked == true)
+  //find length based on last point
+  if (lengthbtn.checked == true)
   {
     getcoord = coordX.length -1
-     //calculate pipe length value automatically
-     if (coordY[getcoord] > 0)
-     {
-       let bar = confirm('Confirm or deny');
-       if (bar == true)
-       {
-         if (arr_valueFirst.length == 0)
-         {
-           arr_valueFirst = [], arr_valueSecond=[]
-           arr_valueFirst.push(coordX[getcoord], coordY[getcoord]);
-           drawcircle("purple",coordX[getcoord],coordY[getcoord],0.5)
-           valueFirst = Number(prompt("1st pipelength value"));
-         }
- 
-         else
-         {
-           arr_valueSecond.push(coordX[getcoord], arr_valueFirst[1]);
-           while(valueSecond == 0)
-           {
-             valueSecond = Number(prompt("2nd pipelength value"));
-             if (valueSecond == 0)
-             {
-               alert("Please insert pipelength value")
-             }
-           }
-
-           if(point.length > 0)
+    //calculate pipe length value automatically
+    if (coordY[getcoord] > 0)
+    {
+      let bar = confirm('Confirm or deny');
+      if (bar == true)
+      {
+        if (checking == 0)
+        {
+          arr_valueFirst = [], arr_valueSecond=[]
+          valueFirst = (prompt("1st pipelength value"));
+          if(valueFirst != null)
           {
-            pipelength = calc_length(arr_valueFirst[0], arr_valueSecond[0], valueFirst, valueSecond);
+            valueFirst = Number(valueFirst)
+            arr_valueFirst.push(coordX[getcoord], coordY[getcoord]);
+            checking = 1
           }
-           //store x coordinate for length and its value
-          save_length.push([arr_valueFirst[0], arr_valueSecond[0]])
-          save_length_y.push([arr_valueFirst[1], arr_valueSecond[1]])
-          save_values.push([valueFirst, valueSecond])
-          valueSecond = 0, arr_valueFirst=[]
-          lengthbtn.checked= false, pointbtn.checked=true
-          len = save_length.length - 1
-
-          drawcircle("purple", save_length[len][0],save_length_y[len][0],0.5)
-          drawcircle("purple", save_length[len][1],save_length_y[len][1],0.5)  
-
-          drawline(save_length[len][0],save_length_y[len][0],save_length[len][1],save_length_y[len][1])
         }
+
+        else
+        {
+          valueSecond = (prompt("2nd pipelength value"));
+          console.log('valueSecond',valueSecond)
+          if(valueSecond != null)
+          {
+            arr_valueSecond.push(coordX[getcoord], arr_valueFirst[1]);
+            valueSecond = Number(valueSecond)
+            if(point.length > 0)
+            {
+              pipelength = calc_length(arr_valueFirst[0], arr_valueSecond[0], valueFirst, valueSecond);
+            }
+            //store x coordinate for length and its value
+            save_length.push([arr_valueFirst[0], arr_valueSecond[0]])
+            save_values.push([valueFirst, valueSecond])
+            checking = 0
+            lengthbtn.checked= false, pointbtn.checked=true
+
+            drawcircle("purple",arr_valueFirst[0],arr_valueFirst[1], 0.5, valueFirst)
+            drawcircle("purple",arr_valueSecond[0],arr_valueSecond[1], 0.5, valueSecond)
+            drawline(arr_valueFirst[0],arr_valueFirst[1],arr_valueSecond[0],arr_valueSecond[1])
+          }  
+        }                               
       }
-    }
-  }
-  
-  
+    }  
+  }  
 });
 
 Load_Image()

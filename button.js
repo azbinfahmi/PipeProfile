@@ -47,7 +47,7 @@ function key_press()
   }
 
   // Check for "Shift + z" key combination 90 for Z, 222 for ' or "
-  if ((event.keyCode === 90 || event.keyCode === 222)  && isShiftDown) {
+  if (((event.keyCode === 90 || event.keyCode === 222)  && isShiftDown) || event.keyCode === 8 ||  event.key === "'") {
     undobtn.click();
   }
 
@@ -76,20 +76,21 @@ function key_press()
   }
 
   //copy previous pipecoord or groundcoord
-  if(event.key === '?' && isShiftDown)
+  if(event.key === '?' && isShiftDown || (event.key === '/') )
   {
-    console.log('x', x)
-    copy_previous()
-    console.log('pipecoord',pipecoord, mark1, mark2)
+    copy_gradient()
   }
 
   //copy previous pipecoord with same length
-  if((event.key === '>' && isShiftDown) || (event.which === 2))
+  if((event.key === '>' && isShiftDown) || (event.key === '.') )
   {
-    console.log('>')
-    copy_previous_spot()
+    copy_previous()
   }
 
+  if((event.key === 's' && isShiftDown) || (event.key === 's'))
+  {
+    copy_previous_spot()
+  }
 
   //zoom in and out button 187 is "+" , 189 is "-"
   if((event.key === '+') || (event.key === '-'))
@@ -111,7 +112,7 @@ function key_press()
   if(maxdepth2.length >= 2)
   {
      //point (P)
-    if(event.keyCode === 80 && isShiftDown)
+    if((event.keyCode === 80 && isShiftDown) || event.key === "p" || event.key === "P" )
     {
       if(pointbtn.checked == false)
       {
@@ -138,7 +139,7 @@ function key_press()
     }
 
     // calc length (L)
-    if(event.keyCode === 76 && isShiftDown)
+    if((event.keyCode === 76 && isShiftDown) || event.key === "l" || event.key === "L")
     {
       if(lengthbtn.checked == false)
       {

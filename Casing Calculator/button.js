@@ -45,7 +45,7 @@ function key_press()
   }
 
   // Check for "Shift + z" key combination 90 for Z, 222 for ' or "
-  if ((event.keyCode === 90 || event.keyCode === 222)  && isShiftDown) {
+  if (((event.keyCode === 90 || event.keyCode === 222)  && isShiftDown) || event.keyCode === 8 ||  event.key === "'") {
     undobtn.click();
   }
   //O
@@ -54,7 +54,7 @@ function key_press()
     opnbtn.click()
   }
   //point (P)
-  if(event.keyCode === 80 && isShiftDown)
+  if((event.keyCode === 80 && isShiftDown) || event.key === "p" || event.key === "P" )
   {
     if(pointbtn.checked == false)
     {
@@ -81,7 +81,7 @@ function key_press()
   }
 
   // calc length (L)
-  if(event.keyCode === 76 && isShiftDown)
+  if((event.keyCode === 76 && isShiftDown) || event.key === "l" || event.key === "L")
   {
     if(lengthbtn.checked == false)
     {
