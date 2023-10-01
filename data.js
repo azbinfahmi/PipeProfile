@@ -369,7 +369,7 @@ function drawLine(x) {
 
   else
   {
-    if (x==arr_valueSecond[0])
+    if (x==arr_valueSecond[0] && actual_place == 1)
     {
       ctx.strokeStyle = 'red';
       ctx.lineWidth = 2;
