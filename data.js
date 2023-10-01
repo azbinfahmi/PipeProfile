@@ -358,7 +358,7 @@ function drawline(x1,y1,x2,y2)
 //draw vertical line
 function drawLine(x) {
   // Draw the line
-  
+
   if(myImage == undefined)
   {
     ctx.beginPath();
@@ -369,6 +369,17 @@ function drawLine(x) {
 
   else
   {
+    if (x==arr_valueSecond[0])
+    {
+      ctx.strokeStyle = 'red';
+      ctx.lineWidth = 2;
+    }
+
+    else
+    {
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = 1;
+    }
     ctx.beginPath();
     ctx.moveTo(x, 0);
     ctx.lineTo(x, myImage.height * Scale);
