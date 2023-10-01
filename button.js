@@ -46,8 +46,8 @@ function key_press()
     isShiftDown = true;
   }
 
-  // Check for "Shift + z" key combination 90 for Z, 222 for ' or "
-  if (((event.keyCode === 90 || event.keyCode === 222)  && isShiftDown) || event.keyCode === 8 ||  event.key === "'") {
+  // Check for key combination 90 for Z, 222 for ' or "
+  if (event.keyCode === 8) {
     undobtn.click();
   }
 
@@ -75,27 +75,62 @@ function key_press()
     delbtn.click()
   }
 
-  //copy previous pipecoord or groundcoord
+  //copy gradient from previous gradient
   if(event.key === '?' && isShiftDown || (event.key === '/') )
   {
     copy_gradient()
+    actual_place = 0
   }
 
-  //copy previous pipecoord with same length
+  //copy previous coord
   if((event.key === '>' && isShiftDown) || (event.key === '.') )
   {
     copy_previous()
+    actual_place = 0
   }
 
+  //copy previous coord with same length
   if((event.key === 's' && isShiftDown) || (event.key === 's'))
   {
     copy_previous_spot()
+    actual_place = 0
+  }
+
+  //readjust depth value
+  if (pipecoord.length > 0  || groundcoord.length > 0)
+  {
+    if((event.key === "ArrowUp" && isShiftDown))
+    {
+      change_depth('increase')
+    }
+
+    if((event.key === "ArrowDown" && isShiftDown))
+    {
+      change_depth('decrease')
+    }
+  }
+
+  //find the rotated angle
+  if((event.key === "r" || event.key === "R" ) && isShiftDown )
+  {
+    if(arr_valueSecond.length > 0)
+    {
+      pointbtn.checked = false
+      actual_place = 1
+    }
+
+    else
+    {
+      alert("Required length")
+      lengthbtn.checked = true
+      pointbtn.checked = false
+    }
   }
 
   //zoom in and out button 187 is "+" , 189 is "-"
-  if((event.key === '+') || (event.key === '-'))
+  if( (event.key === 'z'|| event.key === 'Z') || (event.key === 'z' && isShiftDown))
   {
-    if(event.key === '+')
+    if((event.key === 'z' || event.key === 'Z') && !isShiftDown)
     {
       zoomInButton.click()
       console.log("zom in")
@@ -165,15 +200,15 @@ function key_press()
     
     
   }
-  })
 
+  })
 
   document.addEventListener("keyup", function(event) {
     // Check for "Shift" key
     if (event.keyCode === 16 || event.keyCode === 17) {
       isShiftDown = false;
     }
-  });
+  })
 }
 
 // Add click event listeners to the zoom buttons

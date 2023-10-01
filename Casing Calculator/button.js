@@ -45,7 +45,7 @@ function key_press()
   }
 
   // Check for "Shift + z" key combination 90 for Z, 222 for ' or "
-  if (((event.keyCode === 90 || event.keyCode === 222)  && isShiftDown) || event.keyCode === 8 ||  event.key === "'") {
+  if (event.keyCode === 8) {
     undobtn.click();
   }
   //O
@@ -105,21 +105,22 @@ function key_press()
     }
   }
 
-   //zoom in and out button 187 is "+" , 189 is "-"
-   if((event.key === '+') || (event.key === '-'))
-   {
-     if(event.key === '+')
-     {
-       zoomInButton.click()
-       console.log("zom in")
-     }
- 
-     else
-     {
-       zoomOutButton.click()
-       console.log("zom out")
-     }
-   }
+  //zoom in and out button 187 is "+" , 189 is "-"
+  if( (event.key === 'z'|| event.key === 'Z') || (event.key === 'z' && isShiftDown))
+  {
+    if((event.key === 'z' || event.key === 'Z') && !isShiftDown)
+    {
+      zoomInButton.click()
+      console.log("zom in")
+    }
+
+    else
+    {
+      zoomOutButton.click()
+      console.log("zom out")
+    }
+  }
+
 
    
   })

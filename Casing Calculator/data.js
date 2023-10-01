@@ -371,7 +371,8 @@ canvasElem.addEventListener("mousedown", function(e)
 
   if(pointbtn.checked == true)
   {
-    let bar = confirm("Confirm or deny")
+    //let bar = confirm("Confirm or deny")
+    let bar =  true
     if (bar == true)
     {
       mark = mark + 1
@@ -382,14 +383,29 @@ canvasElem.addEventListener("mousedown", function(e)
 
       if (save_values.length > 0)
       {
-        if((point[point.length-1][0] > save_length[save_length.length-1][0]) && (point[point.length-1][0] < save_length[save_length.length-1][1]))
+        if(save_length[save_length.length-1][0] < save_length[save_length.length-1][1] )
         {
-          len = save_values.length - 1
-          pipelength = calc_length(save_length[len][0], save_length[len][1], 
-            save_values[len][0],save_values[len][1])
-          // alert('pipe length value for current point is '+ pipelength.toFixed(2))
-          shortcut = 1     
-        }        
+          if((point[point.length-1][0] > save_length[save_length.length-1][0]) && (point[point.length-1][0] < save_length[save_length.length-1][1]))
+          {
+            len = save_values.length - 1
+            pipelength = calc_length(save_length[len][0], save_length[len][1], 
+              save_values[len][0],save_values[len][1])
+            // alert('pipe length value for current point is '+ pipelength.toFixed(2))
+            shortcut = 1     
+          }        
+        }
+
+        else if (save_length[save_length.length-1][0] > save_length[save_length.length-1][1] )
+        {
+          if((point[point.length-1][0] > save_length[save_length.length-1][1]) && (point[point.length-1][0] < save_length[save_length.length-1][0]))
+          {
+            len = save_values.length - 1
+            pipelength = calc_length(save_length[len][0], save_length[len][1], 
+              save_values[len][0],save_values[len][1])
+            shortcut = 1 
+          }
+
+        }
       }
 
       if (pipelength == 0 && shortcut == 0)
@@ -455,7 +471,8 @@ canvasElem.addEventListener("mousedown", function(e)
     //calculate pipe length value automatically
     if (coordY[getcoord] > 0)
     {
-      let bar = confirm('Confirm or deny');
+      //let bar = confirm('Confirm or deny');
+      let bar =  true
       if (bar == true)
       {
         if (checking == 0)
@@ -473,7 +490,7 @@ canvasElem.addEventListener("mousedown", function(e)
         else
         {
           valueSecond = (prompt("2nd pipelength value"));
-          console.log('valueSecond',valueSecond)
+          //console.log('valueSecond',valueSecond)
           if(valueSecond != null)
           {
             arr_valueSecond.push(coordX[getcoord], arr_valueFirst[1]);

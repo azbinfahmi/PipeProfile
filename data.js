@@ -7,6 +7,7 @@ var arr_valueFirst =[], arr_valueSecond =[], valueFirst=0, valueSecond=0, checki
 var pipelength = 0, mark1 = 0, mark2 = 0, markclone1 =0, markclone2 = 0,  shortcut = 0;
 var myImage, Scale, scale = 1
 var edit_row = -1, del = -1,c_width=0, c_height =0, edit_what = 0
+var actual_place = 0, arr_actual_place =[];
 var x, y
 const imgInput = document.getElementById('imageInput');
 const undobtn = document.querySelector("#undo");
@@ -23,6 +24,8 @@ const canvasElem = document.getElementById("myCanvas");
 const ctx = canvasElem.getContext('2d');
 const depth_number= document.querySelector("#depth_number")
 const length_number= document.querySelector("#length_number")
+//const rotate = document.querySelector("#rotate")
+
 depthbtn.checked = true;
 HHbtn.checked = true;
 LHbtn.checked = true;
@@ -39,6 +42,8 @@ var valueFirst = JSON.parse(localStorage.getItem("valueFirst"));
 var valueSecond = JSON.parse(localStorage.getItem("valueSecond"));
 var save_length = JSON.parse(localStorage.getItem("save_length"));
 var save_values = JSON.parse(localStorage.getItem("save_values"));
+var arr_valueFirst = JSON.parse(localStorage.getItem("arr_valueFirst"));
+var arr_valueSecond = JSON.parse(localStorage.getItem("arr_valueSecond"));
 
 var total_depth = JSON.parse(localStorage.getItem("total_depth"));
 var calc = JSON.parse(localStorage.getItem("calc"));
@@ -61,6 +66,7 @@ if(arr_valueSecond.length == 0)
 if(maxdepth2.length == 2)
 {
   pointbtn.checked = true
+  lengthbtn.checked = false
 }
 
 if(c_height != 0)
@@ -92,6 +98,8 @@ function transf()
   localStorage.setItem("valueSecond", JSON.stringify(valueSecond));
   localStorage.setItem("save_length", JSON.stringify(save_length));
   localStorage.setItem("save_values", JSON.stringify(save_values));
+  localStorage.setItem("arr_valueFirst", JSON.stringify(arr_valueFirst));
+  localStorage.setItem("arr_valueSecond", JSON.stringify(arr_valueSecond));
 
 
   //canvas width and height
@@ -171,6 +179,7 @@ function Load_Image()
           // console.log('myImage',myImage)
           
           redraw()
+          myImage.style.transform = "rotate(45deg)"
         }
       }
     }
@@ -297,6 +306,11 @@ function drawConstantCircle(event)
     color = "purple"
   }
 
+  else if (actual_place == 1)
+  {
+    color = "red"
+    drawLine(arr_valueSecond[0])
+  }
   else
   {
     color = "black"
@@ -471,6 +485,7 @@ function level(y)
   calc = total_pixel / total_depth
   var value = y- maxdepth2[0][2]
   var total = maxdepth2[0][0] - (value / calc)
+  total = Number(total.toFixed(2))
   return total
 }
 //used in edit point in table
@@ -547,7 +562,6 @@ function point_undo()
     }
   }
 }
-
 //undo for length
 function length_undo()
 {
@@ -563,6 +577,7 @@ function length_undo()
     checking = 1
   }
 }
+
 function calc_length_display(arr_valueFirst, arr_valueSecond, valueFirst, valueSecond, x)
 {
   var pix_diff = Math.abs(arr_valueSecond - arr_valueFirst)// 120 - 100 = 20  100 - 120 = -20
@@ -753,9 +768,9 @@ function display_value(x,y)
       if((x > save_length[save_length.length-1][0]) && (x < save_length[save_length.length-1][1]))
       {
         len = save_values.length - 1
-        pipelength = calc_length_display(save_length[len][0], save_length[len][1], 
+        pipelength_display = calc_length_display(save_length[len][0], save_length[len][1], 
           save_values[len][0],save_values[len][1],x)
-        length_number.innerHTML =pipelength.toFixed(2) + " ";
+        length_number.innerHTML =pipelength_display.toFixed(2) + " ";
       }
 
       else
@@ -769,9 +784,9 @@ function display_value(x,y)
       if((x > save_length[save_length.length-1][1]) && (x < save_length[save_length.length-1][0]))
       {
         len = save_values.length - 1
-        pipelength = calc_length_display(save_length[len][0], save_length[len][1], 
+        pipelength_display = calc_length_display(save_length[len][0], save_length[len][1], 
           save_values[len][0],save_values[len][1],x)          
-        length_number.innerHTML =pipelength.toFixed(2) + " ";
+        length_number.innerHTML =pipelength_display.toFixed(2) + " ";
       }
       else
       {
@@ -1208,6 +1223,69 @@ function copy_gradient()
   }
 }
 
+//change depth value 
+function change_depth(a)
+{
+  if(pointbtn.checked == true)
+  {
+    if(mark1 > mark2)
+    {
+      new_point = pipecoord[pipecoord.length-1]
+      X_new_point = new_point[0]
+      Y_new_point = new_point[1]
+      
+      //increase depth value
+      if (a == "increase")
+      {
+        Y_new_point = Y_new_point - (0.01 * calc)
+      }
+
+      //decrease depth value
+      else if (a == "decrease")
+      {
+        Y_new_point = Y_new_point + (0.01 * calc)
+      }
+      pipecoord[pipecoord.length-1] = [X_new_point, Y_new_point]
+      ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
+
+      redraw()
+
+    }
+
+    else
+    {
+      new_point = groundcoord[groundcoord.length-1]
+      X_new_point = new_point[0]
+      Y_new_point = new_point[1]
+      p = data[data.length - 1][2]
+
+      //increase depth value
+      if (a == "increase")
+      {
+        Y_new_point = Y_new_point - (0.01 * calc)
+      }
+
+      //decrease depth value
+      else if (a == "decrease")
+      {
+        Y_new_point = Y_new_point + (0.01 * calc)
+      }
+      groundcoord[groundcoord.length-1] = [X_new_point, Y_new_point]
+      pipelength = data[data.length]
+      groundlevel.push(level(Y_new_point))
+      pipelevel.push(level(pipecoord[mark1 - 1][1]))
+      var combine =pipelevel.concat(groundlevel)
+      data[data.length - 1] = [combine[0],combine[1], p]
+      
+      ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
+      redraw()
+
+      groundlevel =[]
+      pipelevel =[]
+    }
+  }
+}
+
 //alert when tick the depth point button
 depthbtn.addEventListener('change',function(){
 
@@ -1247,11 +1325,12 @@ pointbtn.addEventListener('change',function(){
       alert("Find the depth point first")
       pointbtn.checked = false
       depthbtn.checked = true
+      actual_place = 0
     }
 
     else
     {
-      console.log('azim46')
+      actual_place = 0
       redraw()
     }
   }
@@ -1270,6 +1349,7 @@ lengthbtn.addEventListener('change',function(){
     else
     {
       pointbtn.checked = false
+      actual_place = 0
     }
   }
 })
@@ -1328,18 +1408,18 @@ editbtn.addEventListener("click", function(){
 
   else
   {
+    edit_what = 1
+    // edit_what = 0
+    // while( edit_what == 0)
+    // {
+    //   edit_what = Number(prompt("Enter 1 for edit point's value by insert new value or Enter 2 for edit point's value by adjusting points in canvas", 1))
 
-    edit_what = 0
-    while( edit_what == 0)
-    {
-      edit_what = Number(prompt("Enter 1 for edit point's value by insert new value or Enter 2 for edit point's value by adjusting points in canvas", 1))
-
-      if(edit_what != 1 && edit_what != 2)
-      {
-        alert("Please enter 1 or 2")
-        edit_what = 0
-      }
-    }
+    //   if(edit_what != 1 && edit_what != 2)
+    //   {
+    //     alert("Please enter 1 or 2")
+    //     edit_what = 0
+    //   }
+    // }
 
     //edit table by insert value
     if(edit_what == 1)
@@ -1360,17 +1440,14 @@ editbtn.addEventListener("click", function(){
       ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
       redraw()
     }
-
-    else if (edit_what ==2)
-    {
-      pipecoord[edit_row] = []
-      groundcoord[edit_row] =[]
-      data[edit_row] = []
-      ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
-      redraw()
-    }
-    
-   
+    // else if (edit_what ==2)
+    // {
+    //   pipecoord[edit_row] = []
+    //   groundcoord[edit_row] =[]
+    //   data[edit_row] = []
+    //   ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
+    //   redraw()
+    // }      
   }
 
 })
@@ -1522,13 +1599,40 @@ del_databtn.addEventListener("click", function(){
   total_depth = 0
   c_height = 0
   c_width = 0
+  actual_place=0
   pointbtn.checked = false
   lengthbtn.checked = false
+  ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
   redraw()
   find_coord_clear()
 })
 
+// rotate.addEventListener('click', function(){
+//   if(arr_valueSecond.length > 0)
+//   {
+//     pointbtn.checked = false
+//     actual_place = 1
+//   }
+
+//   else
+//   {
+    
+//     if(maxdepth2.length>1)
+//     {
+//       alert("Required length")
+//       lengthbtn.checked = true
+//       pointbtn.checked = false
+//     }
+
+//     else{
+//       alert("please fill depth point first")
+//     }
+//   }
+
+// });
+
 //make vertical line
+
 canvasElem.addEventListener('mousemove', function(event) {
 
   x = event.offsetX / scale;
@@ -1569,7 +1673,7 @@ canvasElem.addEventListener("mousedown", function(e)
     if (depthbtn.checked == true)
     {
       var maxdepth=[]
-      let bar = confirm('Confirm or deny');
+      let bar = true
       if (bar == true)
       {
         lastx = coordX.length - 1
@@ -1597,7 +1701,7 @@ canvasElem.addEventListener("mousedown", function(e)
           total_depth = maxdepth2[0][0] - maxdepth2[1][0]
           total_pixel = maxdepth2[1][2] - maxdepth2[0][2]
           calc = total_pixel / total_depth
-          console.log('calc',calc)
+          // console.log('calc',calc)
           // console.log(maxdepth2)
           if(depth != null)
           {
@@ -1606,19 +1710,21 @@ canvasElem.addEventListener("mousedown", function(e)
               drawcircle("black", maxdepth2[0][1], maxdepth2[0][2] + (calc * i), 0, i)
             }
             drawLine(maxdepth2[0][1])
+
+            lengthbtn.checked = true
           }
           
           if(depth == null)
           {
             undobtn.click()
-          }        
+          }
+                  
         }
       }     
     }
   }
-
   //find the pipelevel, groundlevel and pipe length
-  if (pointbtn.checked == true)
+  else if (pointbtn.checked == true && actual_place == 0)
   {
     lastx = coordX.length - 1
     lasty = coordY.length - 1
@@ -1744,7 +1850,8 @@ canvasElem.addEventListener("mousedown", function(e)
     {
       if (mark1 == mark2)
       {
-        let bar = confirm('Confirm or deny');
+        //let bar = confirm('Confirm or deny');
+        let bar = true
         if (bar == true)
         {
           shortcut = 0
@@ -1802,7 +1909,7 @@ canvasElem.addEventListener("mousedown", function(e)
       
       else
       {
-        let bar = confirm('Confirm or deny');
+        let bar = true
         if (bar == true)
         {
           //check wheter the ground point is true or not
@@ -1887,15 +1994,15 @@ canvasElem.addEventListener("mousedown", function(e)
       }
     }
   }
-
   //find length based on last point
-  if (lengthbtn.checked == true)
+  else if (lengthbtn.checked == true && actual_place == 0)
   {
     getcoord = coordX.length -1
     //calculate pipe length value automatically
     if (coordY[getcoord] > 0)
     {
-      let bar = confirm('Confirm or deny');
+      //let bar = confirm('Confirm or deny');
+      let bar =true
       if (bar == true)
       {
         if (checking == 0)
@@ -1913,7 +2020,7 @@ canvasElem.addEventListener("mousedown", function(e)
         else
         {
           valueSecond = (prompt("2nd pipelength value"));
-          console.log('valueSecond',valueSecond)
+          //console.log('valueSecond',valueSecond)
           if(valueSecond != null)
           {
             arr_valueSecond.push(coordX[getcoord], arr_valueFirst[1]);
@@ -1935,7 +2042,39 @@ canvasElem.addEventListener("mousedown", function(e)
         }                               
       }
     }  
-  }            
+  }  
+  // find rotate angle
+  else if (actual_place == 1)
+  {
+    
+    arr_actual_place = [x,y]
+    
+    //Tan angle = T/S
+    var T = (arr_actual_place[1] - arr_valueSecond[1])
+    var S = (x - arr_valueFirst[0])
+    angle = Math.atan( Math.abs(T) / S) * (180 / Math.PI)
+    //https://onlineimagetools.com/rotate-image
+    // console.log('T',T)
+    // console.log('S',S)
+
+    if (T > 0)
+    {
+      alert("angle (Clockwise): -" + angle.toFixed(2) + 
+      "\nangle (Counter-Clockwise): +" + angle.toFixed(2))
+    }
+
+    else
+    {
+      alert("angle (Clockwise): +" + angle.toFixed(2) +
+      "\nangle (Counter-Clockwise): -" + angle.toFixed(2))
+    }
+    
+    actual_place = 0
+
+    pointbtn.checked = true;
+  }
+
+  
 });
 
 //generate report
