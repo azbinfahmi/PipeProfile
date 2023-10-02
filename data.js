@@ -7,7 +7,7 @@ var arr_valueFirst =[], arr_valueSecond =[], valueFirst=0, valueSecond=0, checki
 var pipelength = 0, mark1 = 0, mark2 = 0, markclone1 =0, markclone2 = 0,  shortcut = 0;
 var myImage, Scale, scale = 1
 var edit_row = -1, del = -1,c_width=0, c_height =0, edit_what = 0
-var actual_place = 0, arr_actual_place =[];
+var actual_place = 0, arr_actual_place =[], new_data=[];
 var x, y
 const imgInput = document.getElementById('imageInput');
 const undobtn = document.querySelector("#undo");
@@ -152,7 +152,7 @@ function Load_Image()
   imgInput.addEventListener('change', function(e) {
     scale = 1 // ni untuk scale zoom in/out
     const reader = new FileReader();
-    console.log('reader',reader , '\ne',e.target.files)
+    //console.log('reader',reader , '\ne',e.target.files)
     if(e.target.files[0] != undefined)
     {      
       Scale = (prompt("Add a scale to the image","1"))
@@ -604,6 +604,17 @@ function calc_length(arr_valueFirst, arr_valueSecond, valueFirst, valueSecond)
   var pix_diff = Math.abs(arr_valueSecond - arr_valueFirst)// 120 - 100 = 20  100 - 120 = -20
   var val_diff =  Math.abs(valueSecond - valueFirst);//50 - 20 = 30
   var pipedepth_to_pipelength = Math.abs(arr_valueSecond - pipecoord[mark1-1][0]); // 120 - 108 = 12
+  var value_total = (val_diff / pix_diff) * pipedepth_to_pipelength; // 30/20 = 1.5 * 12 = 18
+  var final_ans = valueSecond - value_total;
+  return final_ans
+}
+
+//recaulculate length
+function recalculate_calc_length(arr_valueFirst, arr_valueSecond, valueFirst, valueSecond,new_inserted)
+{
+  var pix_diff = Math.abs(arr_valueSecond - arr_valueFirst)// 120 - 100 = 20  100 - 120 = -20
+  var val_diff =  Math.abs(valueSecond - valueFirst);//50 - 20 = 30
+  var pipedepth_to_pipelength = Math.abs(arr_valueSecond - new_inserted); // 120 - 108 = 12
   var value_total = (val_diff / pix_diff) * pipedepth_to_pipelength; // 30/20 = 1.5 * 12 = 18
   var final_ans = valueSecond - value_total;
   return final_ans

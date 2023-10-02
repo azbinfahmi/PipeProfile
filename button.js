@@ -143,6 +143,36 @@ function key_press()
     }
   }
 
+  //change all length value in data based on new inserted length when press button
+  if((event.key === "h" || event.key === "H" ) && isShiftDown )
+  {
+    if(arr_valueSecond.length < 0)
+    {
+      alert('Please insert Length first')
+    }
+
+    else if (mark1 != mark2 && (arr_valueSecond.length > 0))
+    {
+      alert('Please Insert Ground depth first in order to use this function')
+    }
+
+    else
+    {
+      valueSecond =Number(prompt("Enter new length value"))
+      save_length=[],save_values=[]
+      save_length.push([arr_valueFirst[0], arr_valueSecond[0]])
+      save_values.push([valueFirst, valueSecond])
+      for (var i = 0; i<mark1;i++)
+      {
+        new_inserted = pipecoord[i][0]
+        new_d = recalculate_calc_length(save_length[len][0], save_length[len][1], save_values[len][0],save_values[len][1], new_inserted)
+        data[i][2] = new_d
+      }
+
+      redraw()
+    }
+  }
+
   //can tick point and length btn when depth button is complete
   if(maxdepth2.length >= 2)
   {
