@@ -57,9 +57,9 @@ if (maxdepth2 == null || maxdepth2 == undefined || maxdepth2.length < 2)
   total_depth = 0, calc = 0
 }
 
-if(arr_valueSecond.length == 0 || arr_valueSecond == 'undefined' || arr_valueSecond == null)
+if (arr_valueSecond === null || typeof arr_valueSecond === 'undefined' || arr_valueSecond.length === 0)
 {
-  arr_valueFirst = []
+  arr_valueFirst = [];
 }
 
 
@@ -150,7 +150,7 @@ function find_coord_clear()
 function Load_Image()
 {
   imgInput.addEventListener('change', function(e) {
-    console.log('test')
+    console.log('test_2')
     scale = 1 // ni untuk scale zoom in/out
     const reader = new FileReader();
     //console.log('reader',reader , '\ne',e.target.files)
