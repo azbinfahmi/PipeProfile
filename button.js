@@ -90,7 +90,7 @@ function key_press()
   }
 
   //copy previous coord with same length
-  if((event.key === 's' && isShiftDown) || (event.key === 's'))
+  if((event.key === 's' && isShiftDown) || (event.key === 'S' && isShiftDown) || (event.key === 's') || (event.key === 'S'))
   {
     copy_previous_spot()
     actual_place = 0

@@ -150,7 +150,7 @@ function find_coord_clear()
 function Load_Image()
 {
   imgInput.addEventListener('change', function(e) {
-    console.log('test_2')
+    //console.log('test_2')
     scale = 1 // ni untuk scale zoom in/out
     const reader = new FileReader();
     //console.log('reader',reader , '\ne',e.target.files)
