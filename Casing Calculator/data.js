@@ -18,8 +18,8 @@ canvasElem.height = window.innerHeight;
 function Load_Image()
 {
   let imgInput = document.getElementById('imageInput');
-  scale = 1
   imgInput.addEventListener('change', function(e) {
+    scale = 1
     const reader = new FileReader();
     if(e.target.files )
     {
@@ -43,6 +43,7 @@ function Load_Image()
           myContext.drawImage(myImage,0,0, myImage.width *Scale, myImage.height *Scale); // Draws the image on canvas
 
           redraw()
+          
         }
       }
     }
