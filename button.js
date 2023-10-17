@@ -2,7 +2,6 @@ const zoomInButton = document.querySelector('#zoom-in');
 const zoomOutButton = document.querySelector('#zoom-out');
 const canvas = document.getElementById('myCanvas');
 const opnbtn = document.querySelector("#open")
-
 var scale = 1
 
 //change open button
@@ -90,7 +89,7 @@ function key_press()
   }
 
   //copy previous coord with same length
-  if((event.key === 's' && isShiftDown) || (event.key === 'S' && isShiftDown) || (event.key === 's') || (event.key === 'S'))
+  if(((event.key === 's' || event.key === 'S') && isShiftDown)|| (event.key === 's') || (event.key === 'S'))
   {
     copy_previous_spot()
     actual_place = 0
@@ -121,10 +120,52 @@ function key_press()
 
     else
     {
-      alert("Required length")
-      lengthbtn.checked = true
-      pointbtn.checked = false
+      
+      if(maxdepth2.length>1)
+      {
+        alert("Required length")
+        lengthbtn.checked = true
+        pointbtn.checked = false
+      }
+
+      else{
+        alert("please fill depth point first")
+      }
     }
+
+   // Get the image data
+  //  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  //  const img_data = imageData.data;
+
+   // Define the target color (e.g., red: RGB 255, 0, 0)
+  //  const targetColor = [0, 0, 255];
+
+  //  // Initialize an array to store the coordinates of matching pixels
+  // matchingCoordinates = [];
+
+  // for (let y = 0; y < canvas.height; y++) 
+  // {
+  //   for (let x = 0; x < canvas.width; x++) 
+  //   {
+  //     const index = (y * canvas.width + x) * 4;
+  //     const red = img_data[index];
+  //     const green = img_data[index + 1];
+  //     const blue = img_data[index + 2];
+  //     // Compare RGB values with the target color
+  //     if (red === targetColor[0] && green === targetColor[1] && blue === targetColor[2]) 
+  //     {
+  //       // This pixel matches the target color, store its coordinates
+  //       matchingCoordinates.push([x,y]);
+  //     }
+  //   }
+  // }
+  //   console.log('matchingCoordinates',matchingCoordinates);
+    
+  //   for (i =0; i<matchingCoordinates.length;i++)
+  //   {
+  //     drawcircle('red', matchingCoordinates[0], matchingCoordinates[1], 1)
+  //   }
+    
   }
 
   //zoom in and out button 187 is "+" , 189 is "-"

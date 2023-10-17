@@ -9,6 +9,7 @@ var myImage, Scale, scale = 1
 var edit_row = -1, del = -1,c_width=0, c_height =0, edit_what = 0
 var actual_place = 0, arr_actual_place =[], new_data=[];
 var x, y
+var matchingCoordinates = [];
 const imgInput = document.getElementById('imageInput');
 const undobtn = document.querySelector("#undo");
 const lengthbtn = document.querySelector("#length");
@@ -178,9 +179,10 @@ function Load_Image()
           // console.log('canvas.width',myCanvas.width)
           // console.log('canvas.height',myCanvas.height)
           // console.log('myImage',myImage)
-          
+
           redraw()
           myImage.style.transform = "rotate(45deg)"
+          
         }
       }
     }
@@ -261,6 +263,26 @@ function drawcircle(color, a, b, no , i)
   ctx.stroke();
 }
 
+function test_color(color, a, b)
+{
+  //draw circle
+  var c = document.getElementById("myCanvas")
+  var ctx = c.getContext("2d");
+  if(scale > 1)
+  {
+    radius = 4 / scale
+  }
+
+  else
+  {
+    radius = 4 * scale
+  }
+  
+  ctx.beginPath();
+  ctx.arc(a, b, radius, 0, 2 * Math.PI*2);
+  ctx.fillStyle =color
+  ctx.fill()
+}
 //draw constant circle
 function drawConstantCircle(event)
 {
@@ -756,8 +778,14 @@ function redraw()
     drawline(arr_valueFirst[0],arr_valueFirst[1],arr_valueSecond[0],arr_valueSecond[1])
   }
 
+
+  for (i =0; i<matchingCoordinates.length;i++)
+  {
+    test_color('red', matchingCoordinates[i][0], matchingCoordinates[i][1])
+  }
   // Start removing from the last row to the first one
   const tableBody = document.getElementById("myTableBody");
+  var table = document.getElementById('myTable');
   table_data = data
   while(tableBody.firstChild)
   {
@@ -775,6 +803,7 @@ function redraw()
       cell2.innerHTML = num.toFixed(2);
     }
   }
+  table.scrollTop = table.scrollHeight;
 }
 
 //display depth and length
@@ -1992,7 +2021,7 @@ canvasElem.addEventListener("mousedown", function(e)
               //create table and insert data
               const tableBody = document.getElementById("myTableBody");
               table_data = data
-
+              var table = document.getElementById('myTable');
               // Start removing from the last row to the first one
               while(tableBody.firstChild)
               {
@@ -2010,6 +2039,8 @@ canvasElem.addEventListener("mousedown", function(e)
                   cell2.innerHTML = num.toFixed(2);
                 }
               }
+
+              table.scrollTop = table.scrollHeight;
             }
             pipelength = 0, pipelevel=[]
           }
